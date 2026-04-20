@@ -50,16 +50,10 @@ const registrationSchema = new mongoose.Schema(
   }
 );
 
-registrationSchema.pre("validate", async function (next) {
-  try {
-    if (this.isNew && !this.registrationId) {
-      const sequence = await getNextSequence("registration");
-      this.registrationId = formatPublicId("REG", sequence, this.registeredAt || new Date());
-    }
-
-    next();
-  } catch (error) {
-    next(error);
+registrationSchema.pre("validate", async function () {
+  if (this.isNew && !this.registrationId) {
+    const sequence = await getNextSequence("registration");
+    this.registrationId = formatPublicId("REG", sequence, this.registeredAt || new Date());
   }
 });
 

@@ -139,24 +139,18 @@ const submissionSchema = new mongoose.Schema(
   }
 );
 
-submissionSchema.pre("validate", async function (next) {
-  try {
-    if (Array.isArray(this.authors)) {
-      this.authors.forEach((author, index) => {
-        if (!author.authorOrder) {
-          author.authorOrder = index + 1;
-        }
-      });
-    }
+submissionSchema.pre("validate", async function () {
+  if (Array.isArray(this.authors)) {
+    this.authors.forEach((author, index) => {
+      if (!author.authorOrder) {
+        author.authorOrder = index + 1;
+      }
+    });
+  }
 
-    if (this.isNew && !this.submissionId) {
-      const sequence = await getNextSequence("submission");
-      this.submissionId = formatPublicId("SUB", sequence, this.submittedAt || new Date());
-    }
-
-    next();
-  } catch (error) {
-    next(error);
+  if (this.isNew && !this.submissionId) {
+    const sequence = await getNextSequence("submission");
+    this.submissionId = formatPublicId("SUB", sequence, this.submittedAt || new Date());
   }
 });
 

@@ -86,20 +86,14 @@ const certificateSchema = new mongoose.Schema(
   }
 );
 
-certificateSchema.pre("validate", async function (next) {
-  try {
-    if (this.isNew && !this.certificateId) {
-      const sequence = await getNextSequence("certificate");
-      this.certificateId = formatPublicId("CERT", sequence, this.issueDate || new Date());
-    }
+certificateSchema.pre("validate", async function () {
+  if (this.isNew && !this.certificateId) {
+    const sequence = await getNextSequence("certificate");
+    this.certificateId = formatPublicId("CERT", sequence, this.issueDate || new Date());
+  }
 
-    if (this.isNew && !this.verificationCode) {
-      this.verificationCode = createVerificationCode();
-    }
-
-    next();
-  } catch (error) {
-    next(error);
+  if (this.isNew && !this.verificationCode) {
+    this.verificationCode = createVerificationCode();
   }
 });
 
