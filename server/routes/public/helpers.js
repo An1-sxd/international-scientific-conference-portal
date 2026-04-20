@@ -35,7 +35,7 @@ export const handleModelError = (res, error) => {
   return sendError(res, 500, "Internal server error.");
 };
 
-const getRequestedConferenceId = (req) => req.query.conferenceId || req.body.conferenceId || null;
+const getRequestedConferenceId = (req) => req.query?.conferenceId || req.body?.conferenceId || null;
 
 export const getActiveConference = () =>
   Conference.findOne({ isActive: true }).sort({ startDate: 1, createdAt: -1 });

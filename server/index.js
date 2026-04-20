@@ -5,13 +5,6 @@ dotenv.config();
 import cors from "cors";
 import connectDB from "./config/db.js";
 
-// app.use(cors({
-//   origin: "http://localhost:5173",
-//   credentials: true // if using cookies/auth
-// }));
-
-app.use(cors());
-
 connectDB();
 
 const PORT = 3000;

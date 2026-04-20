@@ -6,12 +6,13 @@ import { handleModelError, pickCertificateCheck, sendError } from "./helpers.js"
 const router = express.Router();
 
 router.get("/certificates/check", async (req, res) => {
+  console.log(req.query)
   try {
     const certificateId =
-      typeof req.query.certificateId === "string" ? req.query.certificateId.trim().toUpperCase() : "";
+      typeof req.query?.certificateId === "string" ? req.query?.certificateId.trim().toUpperCase() : "";
     const verificationCode =
-      typeof req.query.verificationCode === "string"
-        ? req.query.verificationCode.trim().toUpperCase()
+      typeof req.query?.verificationCode === "string"
+        ? req.query?.verificationCode.trim().toUpperCase()
         : "";
 
     if (!certificateId && !verificationCode) {
