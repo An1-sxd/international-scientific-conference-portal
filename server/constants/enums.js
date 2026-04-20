@@ -1,0 +1,34 @@
+export const SUBMISSION_STATUSES = [
+  "PENDING",
+  "UNDER_REVIEW",
+  "ACCEPTED",
+  "REJECTED",
+  "PUBLISHED",
+];
+
+export const REGISTRATION_STATUSES = [
+  "REGISTERED",
+  "CONFIRMED",
+  "CANCELLED",
+];
+
+export const CERTIFICATE_STATUSES = [
+  "GENERATED",
+  "ISSUED",
+  "DOWNLOADED",
+  "REVOKED",
+];
+
+export const PARTICIPANT_TYPES = [
+  "STUDENT",
+  "RESEARCHER",
+  "PROFESSOR",
+  "GUEST",
+  "INDUSTRY",
+];
+
+export const COMMITTEE_USER_ROLES = [
+  "ADMIN",
+  "REVIEWER",
+  "EDITOR",
+];
