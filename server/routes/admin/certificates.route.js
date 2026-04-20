@@ -3,11 +3,14 @@ import express from "express";
 import Registration from "../../models/registration.model.js";
 import Certificate from "../../models/certificate.model.js";
 import { handleModelError, sendError, isValidObjectId } from "../public/helpers.js";
+import { uploadPdf } from "../../middlewares/upload.middleware.js";
+import { uploadBuffer, deleteAsset } from "../../services/cloudinary.service.js";
 
 const router = express.Router();
 
 router.post("/certificates/generate", async (req, res) => {
   try {
+    console.log(req.body)
     const { registrationIdRef } = req.body;
 
     if (!registrationIdRef || !isValidObjectId(registrationIdRef)) {
@@ -51,6 +54,38 @@ router.post("/certificates/generate", async (req, res) => {
     await certificate.save();
 
     return res.status(201).json({ success: true, data: certificate });
+  } catch (error) {
+    return handleModelError(res, error);
+  }
+});
+
+router.patch("/certificates/:id/upload-pdf", uploadPdf("pdf"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!isValidObjectId(id)) return sendError(res, 400, "Invalid certificate ID.");
+
+    if (!req.file) {
+      return sendError(res, 400, "No PDF file provided.");
+    }
+
+    const certificate = await Certificate.findById(id);
+    if (!certificate) return sendError(res, 404, "Certificate not found.");
+
+    const oldPdfPublicId = certificate.pdfPublicId;
+
+    const uploadResult = await uploadBuffer(req.file.buffer, "conference-portal/certificates");
+    
+    certificate.pdfUrl = uploadResult.url;
+    certificate.pdfPublicId = uploadResult.publicId;
+    certificate.status = "ISSUED"; // Mark as issued once PDF is attached
+
+    await certificate.save();
+
+    if (oldPdfPublicId) {
+      await deleteAsset(oldPdfPublicId);
+    }
+
+    return res.json({ success: true, data: certificate });
   } catch (error) {
     return handleModelError(res, error);
   }

@@ -11,10 +11,12 @@ import {
   sendError,
   validateAuthors,
 } from "./helpers.js";
+import { uploadPdf } from "../../middlewares/upload.middleware.js";
+import { uploadBuffer } from "../../services/cloudinary.service.js";
 
 const router = express.Router();
 
-router.post("/submit-paper", async (req, res) => {
+router.post("/submit-paper", uploadPdf("pdf"), async (req, res) => {
   try {
     const { conference, status, message } = await resolveConference(req);
     if (!conference) {
@@ -32,7 +34,16 @@ router.post("/submit-paper", async (req, res) => {
       return sendError(res, 400, "paperTitle and abstract are required.");
     }
 
-    const authorValidationMessage = validateAuthors(req.body.authors);
+    let parsedAuthors = req.body.authors;
+    if (typeof parsedAuthors === "string") {
+      try {
+        parsedAuthors = JSON.parse(parsedAuthors);
+      } catch (e) {
+        return sendError(res, 400, "authors must be a valid JSON array.");
+      }
+    }
+
+    const authorValidationMessage = validateAuthors(parsedAuthors);
     if (authorValidationMessage) {
       return sendError(res, 400, authorValidationMessage);
     }
@@ -46,6 +57,15 @@ router.post("/submit-paper", async (req, res) => {
       return sendError(res, 404, "Theme not found for the selected conference.");
     }
 
+    let finalPdfUrl = typeof req.body.pdfUrl === "string" ? req.body.pdfUrl.trim() : "";
+    let finalPdfPublicId = "";
+
+    if (req.file) {
+      const uploadResult = await uploadBuffer(req.file.buffer, "conference-portal/submissions");
+      finalPdfUrl = uploadResult.url;
+      finalPdfPublicId = uploadResult.publicId;
+    }
+
     const submission = await Submission.create({
       conferenceId: conference._id,
       themeId: theme._id,
@@ -53,8 +73,9 @@ router.post("/submit-paper", async (req, res) => {
       abstract,
       institution: typeof req.body.institution === "string" ? req.body.institution.trim() : "",
       country: typeof req.body.country === "string" ? req.body.country.trim() : "",
-      pdfUrl: typeof req.body.pdfUrl === "string" ? req.body.pdfUrl.trim() : "",
-      authors: normalizeAuthors(req.body.authors),
+      pdfUrl: finalPdfUrl,
+      pdfPublicId: finalPdfPublicId,
+      authors: normalizeAuthors(parsedAuthors),
     });
 
     return res.status(201).json({

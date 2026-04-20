@@ -119,6 +119,11 @@ const submissionSchema = new mongoose.Schema(
       trim: true,
       maxlength: 500,
     },
+    pdfPublicId: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
     submittedAt: {
       type: Date,
       default: Date.now,

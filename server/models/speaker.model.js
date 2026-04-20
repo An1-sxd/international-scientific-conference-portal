@@ -46,6 +46,11 @@ const speakerSchema = new mongoose.Schema(
       trim: true,
       maxlength: 500,
     },
+    photoPublicId: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
     email: {
       type: String,
       trim: true,
