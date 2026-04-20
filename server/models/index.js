@@ -1,0 +1,10 @@
+import "./certificate.model.js";
+import "./committeeUser.model.js"
+import "./conference.model.js";
+import "./counter.model.js";
+import "./participant.model.js";
+import "./registration.model.js";
+import "./session.model.js";
+import "./submission.model.js";
+import "./submission.model.js"
+import "./theme.model.js";
