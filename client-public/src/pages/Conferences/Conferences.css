@@ -1,0 +1,4 @@
+/* Conferences list page - minimal extra styles */
+.page-conferences .grid-2 {
+  animation: fadeInUp .5s var(--ease) both;
+}

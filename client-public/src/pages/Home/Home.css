@@ -1,0 +1,287 @@
+/* ═══════════════════════════════════════════════════
+   Home / Landing Page Styles
+   ═══════════════════════════════════════════════════ */
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background: var(--gradient-hero);
+}
+
+.hero__bg-orbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hero__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: .35;
+}
+.hero__orb--1 {
+  width: 500px; height: 500px;
+  background: rgba(99,102,241,.4);
+  top: -10%; left: -5%;
+  animation: orbFloat 8s ease-in-out infinite alternate;
+}
+.hero__orb--2 {
+  width: 350px; height: 350px;
+  background: rgba(6,182,212,.35);
+  bottom: -10%; right: 5%;
+  animation: orbFloat 10s ease-in-out 2s infinite alternate;
+}
+.hero__orb--3 {
+  width: 250px; height: 250px;
+  background: rgba(168,85,247,.3);
+  top: 30%; right: 20%;
+  animation: orbFloat 12s ease-in-out 4s infinite alternate;
+}
+@keyframes orbFloat {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, -40px) scale(1.15); }
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: var(--sp-4xl) var(--sp-lg);
+}
+
+.hero__badge {
+  margin-bottom: var(--sp-lg);
+  font-size: var(--fs-sm);
+}
+
+.hero__title {
+  font-size: var(--fs-hero);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--sp-lg);
+  color: var(--clr-text);
+}
+
+.hero__subtitle {
+  font-size: var(--fs-lg);
+  color: var(--clr-text-dim);
+  max-width: 600px;
+  margin: 0 auto var(--sp-2xl);
+  line-height: 1.7;
+}
+
+.hero__actions {
+  display: flex;
+  gap: var(--sp-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── Stats Bar ── */
+.stats-bar {
+  margin-top: -3rem;
+  position: relative;
+  z-index: 3;
+  padding: 0 var(--sp-lg);
+}
+.stats-bar .grid-4 {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-2xl) var(--sp-xl);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+.stat-item__number {
+  font-size: var(--fs-4xl);
+  font-weight: 900;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-item__label {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Section Alt (subtle bg shift) ── */
+.section--alt {
+  background: rgba(255,255,255,.015);
+}
+
+/* ── Speaker Card (extra styles) ── */
+.speaker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-sm);
+  text-decoration: none;
+  color: inherit;
+}
+.speaker-card__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--clr-border-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--clr-surface-2);
+  margin-bottom: var(--sp-sm);
+  flex-shrink: 0;
+}
+.speaker-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.speaker-card__initials {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--clr-primary-h);
+}
+.speaker-card__name {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--clr-text);
+}
+.speaker-card__title {
+  font-size: var(--fs-sm);
+  color: var(--clr-primary-h);
+  font-weight: 500;
+}
+.speaker-card__affiliation {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+}
+.speaker-card__country {
+  margin-top: auto;
+}
+.speaker-card__topic {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-dim);
+  font-style: italic;
+  margin-top: var(--sp-xs);
+}
+
+/* ── Conference Card (extra styles) ── */
+.conf-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  text-decoration: none;
+  color: inherit;
+}
+.conf-card__header {
+  display: flex;
+  gap: var(--sp-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.conf-card__name {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--clr-text);
+  line-height: 1.3;
+}
+.conf-card__slogan {
+  font-size: var(--fs-sm);
+  color: var(--clr-primary-h);
+  font-style: italic;
+}
+.conf-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.conf-card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  font-size: var(--fs-sm);
+  color: var(--clr-text-dim);
+}
+.conf-card__icon { font-size: var(--fs-base); }
+.conf-card__desc {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+  line-height: 1.6;
+  margin-top: var(--sp-xs);
+}
+
+/* ── Theme Card ── */
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+}
+.theme-card__code { align-self: flex-start; }
+.theme-card__label {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--clr-text);
+}
+.theme-card__desc {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+  line-height: 1.6;
+}
+
+/* ── CTA Box ── */
+.cta-box {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-3xl) var(--sp-2xl);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-card);
+  opacity: 1;
+}
+.cta-box > * { position: relative; z-index: 1; }
+.cta-box__title {
+  font-size: var(--fs-3xl);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--sp-md);
+}
+.cta-box__desc {
+  color: var(--clr-text-dim);
+  font-size: var(--fs-md);
+  max-width: 500px;
+  margin: 0 auto var(--sp-xl);
+}
+.cta-box__actions {
+  display: flex;
+  gap: var(--sp-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}

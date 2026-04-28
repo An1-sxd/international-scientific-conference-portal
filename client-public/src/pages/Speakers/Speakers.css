@@ -1,0 +1,3 @@
+.page-speakers .grid-4 {
+  animation: fadeInUp .5s var(--ease) both;
+}

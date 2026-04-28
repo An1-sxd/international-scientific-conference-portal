@@ -1,5 +1,5 @@
 import "./certificate.model.js";
-import "./committeeUser.model.js"
+// import "./committeeUser.model.js"
 import "./conference.model.js";
 import "./counter.model.js";
 import "./participant.model.js";

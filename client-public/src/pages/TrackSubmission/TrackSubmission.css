@@ -1,0 +1,98 @@
+/* ═══════════════════════════════════════════════════
+   Track Submission Page Styles
+   ═══════════════════════════════════════════════════ */
+
+.track-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-2xl);
+}
+
+.track-card__tabs {
+  display: flex;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-xl);
+  background: var(--clr-surface-2);
+  border-radius: var(--r-lg);
+  padding: 4px;
+}
+.track-card__tab {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--clr-text-dim);
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+}
+.track-card__tab--active {
+  background: var(--gradient-primary);
+  color: #fff;
+}
+
+.track-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+
+.track-card__error {
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.3);
+  color: var(--clr-danger);
+  padding: var(--sp-sm) var(--sp-md);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+}
+
+/* ── Result ── */
+.track-result {
+  margin-top: var(--sp-xl);
+  padding-top: var(--sp-xl);
+  border-top: 1px solid var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+.track-result__title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--clr-text);
+  margin-bottom: var(--sp-sm);
+}
+.track-result__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-sm) 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.track-result__label {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+  font-weight: 500;
+}
+.track-result__value {
+  font-size: var(--fs-sm);
+  color: var(--clr-text);
+  font-weight: 600;
+}
+.track-result__comment {
+  background: var(--clr-surface-2);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
+  margin-top: var(--sp-sm);
+}
+.track-result__comment p {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-dim);
+  line-height: 1.7;
+  margin-top: var(--sp-sm);
+}
