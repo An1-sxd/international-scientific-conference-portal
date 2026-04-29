@@ -63,134 +63,136 @@ export default function ConferenceDetail() {
   const { conference: conf, speakers, themes, sessions } = data;
 
   return (
-    <div className="conf-detail fade-in">
-      {/* ── Hero Banner ── */}
-      <section className="conf-detail__hero" id="conf-detail-hero">
-        <div className="conf-detail__hero-bg">
-          <div className="hero__orb hero__orb--1"></div>
-          <div className="hero__orb hero__orb--2"></div>
-        </div>
-        <div className="container conf-detail__hero-content">
-          <div className="conf-detail__badges">
-            <span className="badge badge--primary">{conf.country || "International"}</span>
-            {conf.isActive && <span className="badge badge--success">Active</span>}
+    <>
+      <div className="conf-detail fade-in">
+        {/* ── Hero Banner ── */}
+        <section className="conf-detail__hero" id="conf-detail-hero">
+          <div className="conf-detail__hero-bg">
+            <div className="hero__orb hero__orb--1"></div>
+            <div className="hero__orb hero__orb--2"></div>
           </div>
-          <h1 className="conf-detail__title">{conf.name}</h1>
-          {conf.slogan && <p className="conf-detail__slogan">{conf.slogan}</p>}
-
-          <div className="conf-detail__meta-row">
-            <div className="conf-detail__meta-item">
-              <span>📅</span>
-              <span>{fmt(conf.startDate)} — {fmt(conf.endDate)}</span>
+          <div className="container conf-detail__hero-content">
+            <div className="conf-detail__badges">
+              <span className="badge badge--primary">{conf.country || "International"}</span>
+              {conf.isActive && <span className="badge badge--success">Active</span>}
             </div>
-            {conf.venue && (
+            <h1 className="conf-detail__title">{conf.name}</h1>
+            {conf.slogan && <p className="conf-detail__slogan">{conf.slogan}</p>}
+
+            <div className="conf-detail__meta-row">
               <div className="conf-detail__meta-item">
-                <span>📍</span>
-                <span>{conf.venue}{conf.city ? `, ${conf.city}` : ""}</span>
+                <span>📅</span>
+                <span>{fmt(conf.startDate)} — {fmt(conf.endDate)}</span>
               </div>
-            )}
-            {conf.contactEmail && (
-              <div className="conf-detail__meta-item">
-                <span>✉️</span>
-                <a href={`mailto:${conf.contactEmail}`}>{conf.contactEmail}</a>
-              </div>
-            )}
-          </div>
-
-          <button
-            className="btn btn--primary btn--lg"
-            id="register-conference-btn"
-            onClick={() => setShowRegModal(true)}
-          >
-            Register for this Conference
-          </button>
-        </div>
-      </section>
-
-      <div className="container">
-        {/* ── Description ── */}
-        {conf.description && (
-          <section className="conf-detail__section" id="conf-description">
-            <h2 className="conf-detail__section-title">About this Conference</h2>
-            <p className="conf-detail__description">{conf.description}</p>
-          </section>
-        )}
-
-        {/* ── Themes ── */}
-        {themes.length > 0 && (
-          <section className="conf-detail__section" id="conf-themes">
-            <h2 className="conf-detail__section-title">Themes</h2>
-            <div className="grid-3">
-              {themes.map((t) => (
-                <div key={t._id} className="card theme-card">
-                  <span className="theme-card__code badge badge--accent">{t.code}</span>
-                  <h3 className="theme-card__label">{t.label}</h3>
-                  {t.description && <p className="theme-card__desc">{t.description}</p>}
+              {conf.venue && (
+                <div className="conf-detail__meta-item">
+                  <span>📍</span>
+                  <span>{conf.venue}{conf.city ? `, ${conf.city}` : ""}</span>
                 </div>
-              ))}
+              )}
+              {conf.contactEmail && (
+                <div className="conf-detail__meta-item">
+                  <span>✉️</span>
+                  <a href={`mailto:${conf.contactEmail}`}>{conf.contactEmail}</a>
+                </div>
+              )}
             </div>
-          </section>
-        )}
 
-        {/* ── Speakers ── */}
-        {speakers.length > 0 && (
-          <section className="conf-detail__section" id="conf-speakers">
-            <h2 className="conf-detail__section-title">Speakers</h2>
-            <div className="grid-4">
-              {speakers.map((s) => (
-                <SpeakerCard key={s._id} speaker={s} />
-              ))}
-            </div>
-          </section>
-        )}
+            <button
+              className="btn btn--primary btn--lg"
+              id="register-conference-btn"
+              onClick={() => setShowRegModal(true)}
+            >
+              Register for this Conference
+            </button>
+          </div>
+        </section>
 
-        {/* ── Agenda / Sessions ── */}
-        {sessions.length > 0 && (
-          <section className="conf-detail__section" id="conf-agenda">
-            <h2 className="conf-detail__section-title">Agenda</h2>
-            <div className="agenda-list">
-              {sessions.map((s) => (
-                <div key={s._id} className="card agenda-item" id={`session-${s._id}`}>
-                  <div className="agenda-item__time">
-                    <span className="agenda-item__time-start">{fmtTime(s.startsAt)}</span>
-                    <span className="agenda-item__time-sep">—</span>
-                    <span className="agenda-item__time-end">{fmtTime(s.endsAt)}</span>
-                    <span className="agenda-item__date">{fmt(s.startsAt)}</span>
+        <div className="container">
+          {/* ── Description ── */}
+          {conf.description && (
+            <section className="conf-detail__section" id="conf-description">
+              <h2 className="conf-detail__section-title">About this Conference</h2>
+              <p className="conf-detail__description">{conf.description}</p>
+            </section>
+          )}
+
+          {/* ── Themes ── */}
+          {themes.length > 0 && (
+            <section className="conf-detail__section" id="conf-themes">
+              <h2 className="conf-detail__section-title">Themes</h2>
+              <div className="grid-3">
+                {themes.map((t) => (
+                  <div key={t._id} className="card theme-card">
+                    <span className="theme-card__code badge badge--accent">{t.code}</span>
+                    <h3 className="theme-card__label">{t.label}</h3>
+                    {t.description && <p className="theme-card__desc">{t.description}</p>}
                   </div>
-                  <div className="agenda-item__body">
-                    <h3 className="agenda-item__title">{s.sessionTitle}</h3>
-                    <div className="agenda-item__tags">
-                      {s.themeId && (
-                        <span className="badge badge--accent">{s.themeId.code || s.themeId.label}</span>
-                      )}
-                      {s.room && <span className="badge badge--primary">🚪 {s.room}</span>}
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Speakers ── */}
+          {speakers.length > 0 && (
+            <section className="conf-detail__section" id="conf-speakers">
+              <h2 className="conf-detail__section-title">Speakers</h2>
+              <div className="grid-4">
+                {speakers.map((s) => (
+                  <SpeakerCard key={s._id} speaker={s} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Agenda / Sessions ── */}
+          {sessions.length > 0 && (
+            <section className="conf-detail__section" id="conf-agenda">
+              <h2 className="conf-detail__section-title">Agenda</h2>
+              <div className="agenda-list">
+                {sessions.map((s) => (
+                  <div key={s._id} className="card agenda-item" id={`session-${s._id}`}>
+                    <div className="agenda-item__time">
+                      <span className="agenda-item__time-start">{fmtTime(s.startsAt)}</span>
+                      <span className="agenda-item__time-sep">—</span>
+                      <span className="agenda-item__time-end">{fmtTime(s.endsAt)}</span>
+                      <span className="agenda-item__date">{fmt(s.startsAt)}</span>
                     </div>
-                    {s.speakerId && (
-                      <Link to={`/speakers/${s.speakerId._id}`} className="agenda-item__speaker">
-                        <span className="agenda-item__speaker-avatar">
-                          {s.speakerId.photoUrl
-                            ? <img src={s.speakerId.photoUrl} alt={s.speakerId.fullName} />
-                            : <span>{s.speakerId.fullName?.[0]}</span>
-                          }
-                        </span>
-                        <div>
-                          <span className="agenda-item__speaker-name">{s.speakerId.fullName}</span>
-                          {s.speakerId.affiliation && (
-                            <span className="agenda-item__speaker-aff">{s.speakerId.affiliation}</span>
-                          )}
-                        </div>
-                      </Link>
-                    )}
-                    {s.description && <p className="agenda-item__desc">{s.description}</p>}
+                    <div className="agenda-item__body">
+                      <h3 className="agenda-item__title">{s.sessionTitle}</h3>
+                      <div className="agenda-item__tags">
+                        {s.themeId && (
+                          <span className="badge badge--accent">{s.themeId.code || s.themeId.label}</span>
+                        )}
+                        {s.room && <span className="badge badge--primary">🚪 {s.room}</span>}
+                      </div>
+                      {s.speakerId && (
+                        <Link to={`/speakers/${s.speakerId._id}`} className="agenda-item__speaker">
+                          <span className="agenda-item__speaker-avatar">
+                            {s.speakerId.photoUrl
+                              ? <img src={s.speakerId.photoUrl} alt={s.speakerId.fullName} />
+                              : <span>{s.speakerId.fullName?.[0]}</span>
+                            }
+                          </span>
+                          <div>
+                            <span className="agenda-item__speaker-name">{s.speakerId.fullName}</span>
+                            {s.speakerId.affiliation && (
+                              <span className="agenda-item__speaker-aff">{s.speakerId.affiliation}</span>
+                            )}
+                          </div>
+                        </Link>
+                      )}
+                      {s.description && <p className="agenda-item__desc">{s.description}</p>}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
       </div>
 
-      {/* ── Registration Modal ── */}
+      {/* ── Registration Modal (outside fade-in div so position:fixed works) ── */}
       {showRegModal && (
         <div className="modal-overlay" onClick={() => setShowRegModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()} id="registration-modal">
@@ -276,6 +278,6 @@ export default function ConferenceDetail() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
