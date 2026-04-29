@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════════
-   Verify Certificate Page Styles
+   Certificate Status Page Styles
    ═══════════════════════════════════════════════════ */
 
 .verify-card {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
   background: var(--clr-surface);
   border: 1px solid var(--clr-border);
@@ -11,108 +11,154 @@
   padding: var(--sp-2xl);
 }
 
-.verify-result {
-  margin-top: var(--sp-xl);
-  padding-top: var(--sp-xl);
-  border-top: 1px solid var(--clr-border);
-}
-
-.verify-result__status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-md);
-  padding: var(--sp-lg);
-  border-radius: var(--r-xl);
-  margin-bottom: var(--sp-xl);
-}
-.verify-result__status--valid {
-  background: rgba(16,185,129,.1);
-  border: 1px solid rgba(16,185,129,.3);
-}
-.verify-result__status--invalid {
-  background: rgba(239,68,68,.1);
-  border: 1px solid rgba(239,68,68,.3);
-}
-.verify-result__status-icon { font-size: 1.5rem; }
-.verify-result__status-text {
-  font-size: var(--fs-lg);
-  font-weight: 700;
-}
-.verify-result__status--valid .verify-result__status-text { color: var(--clr-success); }
-.verify-result__status--invalid .verify-result__status-text { color: var(--clr-danger); }
-
-.verify-result__details {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-sm);
-}
-
-.verify-result__actions {
-  display: flex;
-  gap: var(--sp-md);
-  margin-top: var(--sp-xl);
-  justify-content: center;
-}
-
-/* ── My Certificates Section ── */
-.my-certs {
+/* ── Results list ── */
+.cert-results {
   margin-top: var(--sp-xl);
   display: flex;
   flex-direction: column;
   gap: var(--sp-lg);
 }
 
-.cert-entry {
-  background: var(--clr-surface);
-  border: 1px solid var(--clr-border);
+/* ── Status card ── */
+.cert-status-card {
   border-radius: var(--r-xl);
   overflow: hidden;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--clr-border);
 }
-.cert-entry:hover {
-  border-color: var(--clr-primary);
+.cert-status-card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
-.cert-entry__header {
+/* Border accent per status */
+.cert-status-card--not_accepted {
+  border-left: 4px solid var(--clr-danger, #ef4444);
+}
+.cert-status-card--not_ready {
+  border-left: 4px solid var(--clr-warning, #f59e0b);
+}
+.cert-status-card--ready {
+  border-left: 4px solid var(--clr-success, #10b981);
+}
+
+/* Header */
+.cert-status-card__header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   padding: var(--sp-lg);
-  background: rgba(99,102,241,0.04);
+  background: rgba(99, 102, 241, 0.04);
   border-bottom: 1px solid var(--clr-border);
   gap: var(--sp-md);
 }
-.cert-entry__conf h3 {
+.cert-status-card__conf {
   font-size: var(--fs-lg);
   font-weight: 700;
   margin: 0 0 4px 0;
 }
-.cert-entry__meta {
+.cert-status-card__meta {
   font-size: var(--fs-sm);
   color: var(--clr-text-dim);
 }
+.cert-status-card__reg-id {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  background: var(--clr-surface-2, rgba(99, 102, 241, 0.08));
+  padding: 4px 10px;
+  border-radius: var(--r-md);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
 
-.cert-entry__body {
+/* Body */
+.cert-status-card__body {
   padding: var(--sp-lg);
 }
-.cert-entry__body--pending {
-  text-align: center;
-  color: var(--clr-text-muted);
-  font-size: var(--fs-sm);
+
+/* ── Status messages ── */
+.cert-status-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-md);
+  padding: var(--sp-lg);
+  border-radius: var(--r-lg);
+  margin-bottom: var(--sp-md);
 }
-.cert-entry__body--pending p {
+.cert-status-msg strong {
+  display: block;
+  font-size: var(--fs-md);
+  margin-bottom: 4px;
+}
+.cert-status-msg p {
+  font-size: var(--fs-sm);
   margin: 0;
-  padding: var(--sp-md) 0;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+.cert-status-msg__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
 }
 
-.cert-entry__info-grid {
+/* Danger */
+.cert-status-msg--danger {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.cert-status-msg--danger strong {
+  color: var(--clr-danger, #ef4444);
+}
+.cert-status-msg--danger .cert-status-msg__icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--clr-danger, #ef4444);
+}
+
+/* Warning */
+.cert-status-msg--warning {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+.cert-status-msg--warning strong {
+  color: var(--clr-warning, #f59e0b);
+}
+.cert-status-msg--warning .cert-status-msg__icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--clr-warning, #f59e0b);
+}
+
+/* Success */
+.cert-status-msg--success {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.cert-status-msg--success strong {
+  color: var(--clr-success, #10b981);
+}
+.cert-status-msg--success .cert-status-msg__icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--clr-success, #10b981);
+}
+
+/* ── Certificate details (shown when ready) ── */
+.cert-status-card__details {
+  margin-top: var(--sp-md);
+}
+
+.cert-status-card__info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-md);
   margin-bottom: var(--sp-lg);
 }
-.cert-entry__label {
+.cert-status-card__label {
   display: block;
   font-size: var(--fs-xs);
   color: var(--clr-text-muted);
@@ -121,13 +167,13 @@
   letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
-.cert-entry__value {
+.cert-status-card__value {
   display: block;
   font-size: var(--fs-sm);
   font-weight: 500;
 }
 
-.cert-entry__actions {
+.cert-status-card__actions {
   display: flex;
   gap: var(--sp-md);
   justify-content: center;
@@ -135,9 +181,20 @@
   border-top: 1px solid var(--clr-border);
 }
 
+/* ── Responsive ── */
 @media (max-width: 600px) {
-  .cert-entry__header { flex-direction: column; }
-  .cert-entry__info-grid { grid-template-columns: 1fr; }
-  .cert-entry__actions { flex-direction: column; }
-  .verify-result__actions { flex-direction: column; }
+  .cert-status-card__header {
+    flex-direction: column;
+  }
+  .cert-status-card__info-grid {
+    grid-template-columns: 1fr;
+  }
+  .cert-status-card__actions {
+    flex-direction: column;
+  }
+  .cert-status-msg {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 }

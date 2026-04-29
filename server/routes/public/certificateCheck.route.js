@@ -51,31 +51,51 @@ router.get("/certificates/check", async (req, res) => {
   }
 });
 
-// ── Participant checks his certificates by email ──
-// Returns all registrations + auto-generates certificates for attended conferences
+// ── Check certificate status by registrationId or email ──
+// Returns registrations with certificateStatus: 'not_accepted' | 'not_ready' | 'ready'
 router.get("/certificates/my", async (req, res) => {
   try {
     const email = typeof req.query?.email === "string" ? normalizeEmail(req.query.email) : "";
+    const registrationIdQuery =
+      typeof req.query?.registrationId === "string"
+        ? req.query.registrationId.trim().toUpperCase()
+        : "";
 
-    if (!email) {
-      return sendError(res, 400, "Email is required.");
+    if (!email && !registrationIdQuery) {
+      return sendError(res, 400, "Email or registration ID is required.");
     }
 
-    const participant = await Participant.findOne({ email });
-    if (!participant) {
-      return sendError(res, 404, "No participant found with this email.");
-    }
+    let registrations;
 
-    const registrations = await Registration.find({ participantId: participant._id })
-      .populate("conferenceId", "name startDate endDate venue city country");
+    if (registrationIdQuery) {
+      // Find by public registration ID
+      const reg = await Registration.findOne({ registrationId: registrationIdQuery })
+        .populate("conferenceId", "name startDate endDate venue city country")
+        .populate("participantId");
 
-    if (registrations.length === 0) {
-      return sendError(res, 404, "No registrations found.");
+      if (!reg) return sendError(res, 404, "Registration not found.");
+      registrations = [reg];
+    } else {
+      // Find by participant email
+      const participant = await Participant.findOne({ email });
+      if (!participant) {
+        return sendError(res, 404, "No participant found with this email.");
+      }
+
+      registrations = await Registration.find({ participantId: participant._id })
+        .populate("conferenceId", "name startDate endDate venue city country")
+        .populate("participantId");
+
+      if (registrations.length === 0) {
+        return sendError(res, 404, "No registrations found.");
+      }
     }
 
     const results = [];
 
     for (const reg of registrations) {
+      const participant = reg.participantId;
+
       const entry = {
         conferenceId: reg.conferenceId?._id,
         conferenceName: reg.conferenceId?.name,
@@ -84,11 +104,22 @@ router.get("/certificates/my", async (req, res) => {
         startDate: reg.conferenceId?.startDate,
         endDate: reg.conferenceId?.endDate,
         registrationId: reg.registrationId,
+        registrationStatus: reg.registrationStatus,
         attendanceConfirmed: reg.attendanceConfirmed,
+        certificateStatus: null,
         certificate: null,
       };
 
-      if (reg.attendanceConfirmed) {
+      if (reg.registrationStatus === "CANCELLED") {
+        // Registration was cancelled — not accepted
+        entry.certificateStatus = "not_accepted";
+      } else if (!reg.attendanceConfirmed) {
+        // Accepted but not yet marked as present
+        entry.certificateStatus = "not_ready";
+      } else {
+        // Accepted and present — certificate is ready
+        entry.certificateStatus = "ready";
+
         // Find or create certificate record
         let cert = await Certificate.findOne({ registrationIdRef: reg._id });
 
@@ -107,7 +138,11 @@ router.get("/certificates/my", async (req, res) => {
 
         // Auto-generate PDF if not cached on CDN
         if (!cert.pdfUrl) {
-          cert = await generateAndUploadCertificatePdf(cert._id);
+          try {
+            cert = await generateAndUploadCertificatePdf(cert._id);
+          } catch (_) {
+            // PDF generation may fail (e.g. no service configured), certificate data is still valid
+          }
         }
 
         entry.certificate = {

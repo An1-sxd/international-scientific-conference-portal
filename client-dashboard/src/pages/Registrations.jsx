@@ -27,18 +27,9 @@ export default function Registrations() {
 
   const changeStatus = async (id, registrationStatus) => {
     try {
-      const attendanceConfirmed = registrationStatus === 'CONFIRMED';
-      await updateRegistrationStatus(id, { registrationStatus, attendanceConfirmed });
+      await updateRegistrationStatus(id, { registrationStatus });
       load();
       setToast({ msg: `Status → ${registrationStatus}`, type: 'success' });
-    } catch (e) { setToast({ msg: e.message, type: 'error' }); }
-  };
-
-  const toggleAttendance = async (item) => {
-    try {
-      await updateRegistrationStatus(item._id, { attendanceConfirmed: !item.attendanceConfirmed });
-      load();
-      setToast({ msg: item.attendanceConfirmed ? 'Attendance removed' : 'Attendance confirmed!', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
@@ -99,14 +90,10 @@ export default function Registrations() {
                     <td>{r.participantId?.email || '—'}</td>
                     <td><span className="badge badge--accent">{r.participantId?.participantType || '—'}</span></td>
                     <td><span className={`badge badge--${statusBadge(r.registrationStatus)}`}>{r.registrationStatus}</span></td>
-                    <td style={{ textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
-                        className="attendance-check"
-                        checked={r.attendanceConfirmed}
-                        onChange={() => toggleAttendance(r)}
-                        title="Toggle attendance"
-                      />
+                    <td>
+                      <span className={`badge badge--${r.attendanceConfirmed ? 'success' : 'neutral'}`}>
+                        {r.attendanceConfirmed ? '✓ Yes' : 'No'}
+                      </span>
                     </td>
                     <td>{new Date(r.registeredAt).toLocaleDateString()}</td>
                     <td>

@@ -27,6 +27,7 @@ router.get("/participants", async (req, res) => {
           registrationStatus: reg.registrationStatus,
           attendanceConfirmed: reg.attendanceConfirmed,
           registrationId: reg.registrationId,
+          registrationRef: reg._id,
         });
       }
     }

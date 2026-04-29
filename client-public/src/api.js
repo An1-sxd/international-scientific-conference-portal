@@ -65,6 +65,11 @@ export const fetchMyCertificates = (email) => {
   return request(`/certificates/my?${qs}`);
 };
 
+export const checkCertificateStatus = (params) => {
+  const qs = new URLSearchParams(params).toString();
+  return request(`/certificates/my?${qs}`);
+};
+
 // ─── Registration Tracking ───
 export const trackRegistration = (params) => {
   const qs = new URLSearchParams(params).toString();

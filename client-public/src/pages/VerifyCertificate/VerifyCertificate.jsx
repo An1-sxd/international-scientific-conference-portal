@@ -1,35 +1,24 @@
 import { useState } from "react";
-import { checkCertificate, fetchMyCertificates } from "../../api";
+import { checkCertificateStatus } from "../../api";
 import "./VerifyCertificate.css";
 
 export default function VerifyCertificate() {
-  const [mode, setMode] = useState("email");
+  const [mode, setMode] = useState("id");
+  const [registrationId, setRegistrationId] = useState("");
   const [email, setEmail] = useState("");
-  const [certificateId, setCertificateId] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [myCerts, setMyCerts] = useState(null);
+  const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
 
   const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setResult(null);
-    setMyCerts(null);
+    setResults(null);
     try {
-      if (mode === "email") {
-        const res = await fetchMyCertificates(email);
-        setMyCerts(res.data);
-      } else {
-        const params =
-          mode === "certId"
-            ? { certificateId }
-            : { verificationCode };
-        const res = await checkCertificate(params);
-        setResult(res.data);
-      }
+      const params = mode === "id" ? { registrationId } : { email };
+      const res = await checkCertificateStatus(params);
+      setResults(res.data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -37,40 +26,52 @@ export default function VerifyCertificate() {
     }
   };
 
+  const resetForm = (newMode) => {
+    setMode(newMode);
+    setResults(null);
+    setError(null);
+  };
+
   return (
     <div className="section fade-in">
       <div className="container">
-        <h1 className="section__title">Certificates</h1>
+        <h1 className="section__title">Certificate Status</h1>
         <p className="section__subtitle">
-          View your attendance certificates or verify a certificate's authenticity.
+          Check your certificate status using your registration ID or email address.
         </p>
 
         <div className="verify-card" id="verify-certificate-form">
           <div className="track-card__tabs">
             <button
+              className={`track-card__tab ${mode === "id" ? "track-card__tab--active" : ""}`}
+              onClick={() => resetForm("id")}
+            >
+              By Registration ID
+            </button>
+            <button
               className={`track-card__tab ${mode === "email" ? "track-card__tab--active" : ""}`}
-              onClick={() => { setMode("email"); setResult(null); setMyCerts(null); setError(null); }}
+              onClick={() => resetForm("email")}
             >
-              My Certificates
-            </button>
-            <button
-              className={`track-card__tab ${mode === "certId" ? "track-card__tab--active" : ""}`}
-              onClick={() => { setMode("certId"); setResult(null); setMyCerts(null); setError(null); }}
-            >
-              By Certificate ID
-            </button>
-            <button
-              className={`track-card__tab ${mode === "code" ? "track-card__tab--active" : ""}`}
-              onClick={() => { setMode("code"); setResult(null); setMyCerts(null); setError(null); }}
-            >
-              By Verification Code
+              By Email
             </button>
           </div>
 
           <form onSubmit={handleSearch} className="track-card__form">
-            {mode === "email" ? (
+            {mode === "id" ? (
               <div className="form-group">
-                <label htmlFor="cert-email">Your Email Address</label>
+                <label htmlFor="cert-reg-id">Registration ID</label>
+                <input
+                  id="cert-reg-id"
+                  className="form-input"
+                  placeholder="e.g. REG-2026-0001"
+                  required
+                  value={registrationId}
+                  onChange={(e) => setRegistrationId(e.target.value)}
+                />
+              </div>
+            ) : (
+              <div className="form-group">
+                <label htmlFor="cert-email">Email Address</label>
                 <input
                   id="cert-email"
                   className="form-input"
@@ -79,30 +80,6 @@ export default function VerifyCertificate() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            ) : mode === "certId" ? (
-              <div className="form-group">
-                <label htmlFor="cert-id">Certificate ID</label>
-                <input
-                  id="cert-id"
-                  className="form-input"
-                  placeholder="e.g. CERT-2026-0001"
-                  required
-                  value={certificateId}
-                  onChange={(e) => setCertificateId(e.target.value)}
-                />
-              </div>
-            ) : (
-              <div className="form-group">
-                <label htmlFor="cert-code">Verification Code</label>
-                <input
-                  id="cert-code"
-                  className="form-input"
-                  placeholder="e.g. ABC123XY"
-                  required
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
                 />
               </div>
             )}
@@ -115,152 +92,148 @@ export default function VerifyCertificate() {
               disabled={loading}
               style={{ width: "100%" }}
             >
-              {loading
-                ? mode === "email" ? "Loading certificates…" : "Verifying…"
-                : mode === "email" ? "View My Certificates" : "Verify Certificate"}
+              {loading ? "Checking…" : "Check Certificate Status"}
             </button>
           </form>
 
-          {/* ── My Certificates results ── */}
-          {myCerts && (
-            <div className="my-certs" id="my-certificates-results">
-              {myCerts.length === 0 ? (
-                <div className="verify-result">
-                  <p style={{ textAlign: "center", color: "var(--clr-text-dim)" }}>
-                    No registrations found for this email.
-                  </p>
-                </div>
-              ) : (
-                myCerts.map((entry, i) => (
-                  <div className="cert-entry" key={i}>
-                    <div className="cert-entry__header">
-                      <div className="cert-entry__conf">
-                        <h3>{entry.conferenceName}</h3>
-                        <span className="cert-entry__meta">
-                          {entry.venue && `${entry.venue}, `}{entry.city}
-                          {entry.startDate && ` · ${new Date(entry.startDate).toLocaleDateString()}`}
-                        </span>
-                      </div>
-                      <span className={`badge ${entry.attendanceConfirmed ? "badge--success" : "badge--warning"}`}>
-                        {entry.attendanceConfirmed ? "Present ✓" : "Not Confirmed"}
+          {/* ── Results ── */}
+          {results && results.length > 0 && (
+            <div className="cert-results" id="certificate-results">
+              {results.map((entry, i) => (
+                <div
+                  className={`cert-status-card cert-status-card--${entry.certificateStatus}`}
+                  key={i}
+                >
+                  {/* Header */}
+                  <div className="cert-status-card__header">
+                    <div>
+                      <h3 className="cert-status-card__conf">
+                        {entry.conferenceName || "Conference"}
+                      </h3>
+                      <span className="cert-status-card__meta">
+                        {entry.venue && `${entry.venue}, `}
+                        {entry.city}
+                        {entry.startDate &&
+                          ` · ${new Date(entry.startDate).toLocaleDateString()}`}
                       </span>
                     </div>
+                    <span className="cert-status-card__reg-id">
+                      {entry.registrationId}
+                    </span>
+                  </div>
 
-                    {entry.certificate ? (
-                      <div className="cert-entry__body">
-                        <div className="cert-entry__info-grid">
+                  {/* Body — status-specific content */}
+                  <div className="cert-status-card__body">
+                    {entry.certificateStatus === "not_accepted" && (
+                      <div className="cert-status-msg cert-status-msg--danger">
+                        <span className="cert-status-msg__icon">✕</span>
+                        <div>
+                          <strong>Registration Cancelled</strong>
+                          <p>
+                            Your registration for this conference has been cancelled.
+                            You are not accepted in this conference.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {entry.certificateStatus === "not_ready" && (
+                      <div className="cert-status-msg cert-status-msg--warning">
+                        <span className="cert-status-msg__icon">⏳</span>
+                        <div>
+                          <strong>Certificate Not Ready</strong>
+                          <p>
+                            Your registration is confirmed, but your attendance has
+                            not been marked yet. Your certificate will be available
+                            once the organizer confirms your presence at the
+                            conference.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {entry.certificateStatus === "ready" && (
+                      <>
+                        <div className="cert-status-msg cert-status-msg--success">
+                          <span className="cert-status-msg__icon">✓</span>
                           <div>
-                            <span className="cert-entry__label">Certificate ID</span>
-                            <span className="cert-entry__value">{entry.certificate.certificateId}</span>
-                          </div>
-                          <div>
-                            <span className="cert-entry__label">Verification Code</span>
-                            <span className="cert-entry__value">{entry.certificate.verificationCode}</span>
-                          </div>
-                          <div>
-                            <span className="cert-entry__label">Status</span>
-                            <span className="badge badge--success">{entry.certificate.status}</span>
-                          </div>
-                          <div>
-                            <span className="cert-entry__label">Issue Date</span>
-                            <span className="cert-entry__value">
-                              {new Date(entry.certificate.issueDate).toLocaleDateString()}
-                            </span>
+                            <strong>Certificate Ready!</strong>
+                            <p>
+                              Your attendance has been confirmed. Your certificate is
+                              ready to view and download.
+                            </p>
                           </div>
                         </div>
 
-                        {entry.certificate.pdfUrl && (
-                          <div className="cert-entry__actions">
-                            <a
-                              href={entry.certificate.pdfUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="btn btn--primary"
-                            >
-                              👁️ View Certificate
-                            </a>
-                            <a
-                              href={entry.certificate.pdfUrl}
-                              download
-                              className="btn btn--outline"
-                            >
-                              ⬇️ Download PDF
-                            </a>
+                        {entry.certificate && (
+                          <div className="cert-status-card__details">
+                            <div className="cert-status-card__info-grid">
+                              <div>
+                                <span className="cert-status-card__label">
+                                  Certificate ID
+                                </span>
+                                <span className="cert-status-card__value">
+                                  {entry.certificate.certificateId}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="cert-status-card__label">
+                                  Verification Code
+                                </span>
+                                <span className="cert-status-card__value">
+                                  {entry.certificate.verificationCode}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="cert-status-card__label">
+                                  Status
+                                </span>
+                                <span className="badge badge--success">
+                                  {entry.certificate.status}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="cert-status-card__label">
+                                  Issue Date
+                                </span>
+                                <span className="cert-status-card__value">
+                                  {new Date(
+                                    entry.certificate.issueDate
+                                  ).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+
+                            {entry.certificate.pdfUrl && (
+                              <div className="cert-status-card__actions">
+                                <a
+                                  href={entry.certificate.pdfUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="btn btn--primary"
+                                >
+                                  👁️ View Certificate
+                                </a>
+                                <a
+                                  href={entry.certificate.pdfUrl}
+                                  download
+                                  className="btn btn--outline"
+                                >
+                                  ⬇️ Download PDF
+                                </a>
+                              </div>
+                            )}
                           </div>
                         )}
-                      </div>
-                    ) : (
-                      <div className="cert-entry__body cert-entry__body--pending">
-                        <p>⏳ Your attendance has not been confirmed yet for this conference. Certificate will be available once the admin marks you as present.</p>
-                      </div>
+                      </>
                     )}
                   </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {/* ── Single certificate verification result ── */}
-          {result && (
-            <div className="verify-result" id="verify-result">
-              <div className={`verify-result__status ${result.valid ? "verify-result__status--valid" : "verify-result__status--invalid"}`}>
-                <span className="verify-result__status-icon">
-                  {result.valid ? "✅" : "❌"}
-                </span>
-                <span className="verify-result__status-text">
-                  {result.valid ? "Certificate is Valid" : "Certificate is Invalid / Revoked"}
-                </span>
-              </div>
-
-              <div className="verify-result__details">
-                <div className="track-result__row">
-                  <span className="track-result__label">Certificate ID</span>
-                  <span className="track-result__value">{result.certificateId}</span>
                 </div>
-                <div className="track-result__row">
-                  <span className="track-result__label">Verification Code</span>
-                  <span className="track-result__value">{result.verificationCode}</span>
-                </div>
-                <div className="track-result__row">
-                  <span className="track-result__label">Type</span>
-                  <span className="badge badge--accent">{result.certificateType}</span>
-                </div>
-                <div className="track-result__row">
-                  <span className="track-result__label">Owner</span>
-                  <span className="track-result__value">{result.ownerName}</span>
-                </div>
-                <div className="track-result__row">
-                  <span className="track-result__label">Status</span>
-                  <span className={`badge ${result.valid ? "badge--success" : "badge--danger"}`}>
-                    {result.status}
-                  </span>
-                </div>
-                <div className="track-result__row">
-                  <span className="track-result__label">Issue Date</span>
-                  <span className="track-result__value">
-                    {new Date(result.issueDate).toLocaleDateString("en-US", {
-                      month: "short", day: "numeric", year: "numeric",
-                    })}
-                  </span>
-                </div>
-                {result.conference && (
-                  <div className="track-result__row">
-                    <span className="track-result__label">Conference</span>
-                    <span className="track-result__value">{result.conference.name}</span>
-                  </div>
-                )}
-              </div>
-
-              {result.pdfUrl && (
-                <div className="verify-result__actions">
-                  <a href={result.pdfUrl} target="_blank" rel="noreferrer" className="btn btn--primary">
-                    👁️ View Certificate
-                  </a>
-                  <a href={result.pdfUrl} download className="btn btn--outline">
-                    ⬇️ Download PDF
-                  </a>
-                </div>
-              )}
+              ))}
             </div>
           )}
         </div>

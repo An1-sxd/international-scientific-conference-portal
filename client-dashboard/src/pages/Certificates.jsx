@@ -79,7 +79,7 @@ export default function Certificates() {
             <div>
               <span className="table-toolbar__title">Certificate Management</span>
               <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--clr-text-muted)', marginTop: 4 }}>
-                Mark participants as present in the Registrations page, then generate certificates. PDFs are auto-generated and stored on CDN.
+                Mark participants as present in the Participants page, then generate certificates. PDFs are auto-generated and stored on CDN.
               </p>
             </div>
             <div className="table-toolbar__actions">
@@ -111,7 +111,7 @@ export default function Certificates() {
               <div className="empty-state__icon">🎓</div>
               <div className="empty-state__title">No certificates generated</div>
               <p style={{ color: 'var(--clr-text-muted)', fontSize: 'var(--fs-sm)', marginTop: 'var(--sp-sm)' }}>
-                Mark participants as present in the Registrations page, then click "Generate All Certificates".
+                Mark participants as present in the Participants page, then click "Generate All Certificates".
               </p>
             </div>
           ) : (

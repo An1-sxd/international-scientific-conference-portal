@@ -19,7 +19,7 @@ export default function Navbar() {
           <NavLink to="/submit-paper" className="navbar__link">Submit Paper</NavLink>
           <NavLink to="/track-submission" className="navbar__link">Track Submission</NavLink>
           <NavLink to="/track-registration" className="navbar__link">Track Registration</NavLink>
-          <NavLink to="/verify-certificate" className="navbar__link">Verify Certificate</NavLink>
+          <NavLink to="/verify-certificate" className="navbar__link">Certificate</NavLink>
         </div>
       </div>
     </nav>
