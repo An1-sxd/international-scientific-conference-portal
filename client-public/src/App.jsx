@@ -8,6 +8,7 @@ import Speakers from "./pages/Speakers/Speakers";
 import SpeakerDetail from "./pages/Speakers/SpeakerDetail";
 import SubmitPaper from "./pages/SubmitPaper/SubmitPaper";
 import TrackSubmission from "./pages/TrackSubmission/TrackSubmission";
+import TrackRegistration from "./pages/TrackRegistration/TrackRegistration";
 import VerifyCertificate from "./pages/VerifyCertificate/VerifyCertificate";
 
 function Layout({ children }) {
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/speakers/:id" element={<SpeakerDetail />} />
           <Route path="/submit-paper" element={<SubmitPaper />} />
           <Route path="/track-submission" element={<TrackSubmission />} />
+          <Route path="/track-registration" element={<TrackRegistration />} />
           <Route path="/verify-certificate" element={<VerifyCertificate />} />
         </Routes>
       </Layout>

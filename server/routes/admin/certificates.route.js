@@ -5,6 +5,7 @@ import Certificate from "../../models/certificate.model.js";
 import { handleModelError, resolveConference, sendError, isValidObjectId } from "../public/helpers.js";
 import { uploadPdf } from "../../middlewares/upload.middleware.js";
 import { uploadBuffer, deleteAsset } from "../../services/cloudinary.service.js";
+import { generateAndUploadCertificatePdf } from "../../services/certificate.service.js";
 
 const router = express.Router();
 
@@ -150,6 +151,20 @@ router.patch("/certificates/:id/upload-pdf", uploadPdf("pdf"), async (req, res) 
     if (oldPdfPublicId) {
       await deleteAsset(oldPdfPublicId);
     }
+
+    return res.json({ success: true, data: certificate });
+  } catch (error) {
+    return handleModelError(res, error);
+  }
+});
+
+// ── Auto-generate PDF for a certificate (uses CDN cache) ──
+router.post("/certificates/:id/generate-pdf", async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!isValidObjectId(id)) return sendError(res, 400, "Invalid certificate ID.");
+
+    const certificate = await generateAndUploadCertificatePdf(id);
 
     return res.json({ success: true, data: certificate });
   } catch (error) {

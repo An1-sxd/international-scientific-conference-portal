@@ -14,6 +14,7 @@ const links = [
     { to: '/registrations', icon: '📝', text: 'Registrations' },
     { to: '/participants', icon: '👥', text: 'Participants' },
     { to: '/submissions', icon: '📄', text: 'Submissions' },
+    { to: '/researches', icon: '📚', text: 'Researches' },
   ]},
   { label: 'CREDENTIALS', items: [
     { to: '/certificates', icon: '🎓', text: 'Certificates' },

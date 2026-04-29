@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { fetchThemes, submitPaper } from "../../api";
+import { fetchConferences, fetchThemes, submitPaper } from "../../api";
 import "./SubmitPaper.css";
 
 export default function SubmitPaper() {
+  const [conferences, setConferences] = useState([]);
+  const [selectedConf, setSelectedConf] = useState("");
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -20,11 +22,28 @@ export default function SubmitPaper() {
   ]);
   const [pdfFile, setPdfFile] = useState(null);
 
+  // Load conferences on mount
   useEffect(() => {
-    fetchThemes()
-      .then((res) => setThemes(res.data || []))
+    fetchConferences()
+      .then((res) => {
+        setConferences(res.data || []);
+        // Auto-select first conference if available
+        if (res.data?.length > 0) {
+          setSelectedConf(res.data[0]._id || res.data[0].id);
+        }
+      })
       .catch(() => {});
   }, []);
+
+  // Load themes when conference changes
+  useEffect(() => {
+    if (!selectedConf) { setThemes([]); return; }
+    fetchThemes(selectedConf)
+      .then((res) => setThemes(res.data || []))
+      .catch(() => setThemes([]));
+    // Reset theme selection when conference changes
+    setForm((prev) => ({ ...prev, themeId: "" }));
+  }, [selectedConf]);
 
   const addAuthor = () => {
     setAuthors([
@@ -53,6 +72,7 @@ export default function SubmitPaper() {
     setError(null);
     try {
       const fd = new FormData();
+      fd.append("conferenceId", selectedConf);
       fd.append("themeId", form.themeId);
       fd.append("paperTitle", form.paperTitle);
       fd.append("abstract", form.abstract);
@@ -101,7 +121,7 @@ export default function SubmitPaper() {
       <div className="container">
         <h1 className="section__title">Submit a Paper</h1>
         <p className="section__subtitle">
-          Submit your research paper for review. Fill in all required fields and attach your PDF.
+          Submit your research paper for review. Select the conference, fill in all required fields and attach your PDF.
         </p>
 
         <form className="submit-form" onSubmit={handleSubmit} id="submit-paper-form">
@@ -109,6 +129,25 @@ export default function SubmitPaper() {
 
           <div className="submit-form__card">
             <h2 className="submit-form__card-title">Paper Information</h2>
+
+            {/* ── Conference Selector ── */}
+            <div className="form-group">
+              <label htmlFor="sp-conference">Conference *</label>
+              <select
+                id="sp-conference"
+                className="form-select"
+                required
+                value={selectedConf}
+                onChange={(e) => setSelectedConf(e.target.value)}
+              >
+                <option value="">Select a conference…</option>
+                {conferences.map((c) => (
+                  <option key={c._id || c.id} value={c._id || c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <div className="form-group">
               <label htmlFor="sp-theme">Theme *</label>
@@ -118,10 +157,11 @@ export default function SubmitPaper() {
                 required
                 value={form.themeId}
                 onChange={(e) => setForm({ ...form, themeId: e.target.value })}
+                disabled={!selectedConf}
               >
-                <option value="">Select a theme…</option>
+                <option value="">{selectedConf ? "Select a theme…" : "Select a conference first"}</option>
                 {themes.map((t) => (
-                  <option key={t._id} value={t._id}>
+                  <option key={t._id || t.id} value={t._id || t.id}>
                     {t.code} — {t.label}
                   </option>
                 ))}
@@ -264,7 +304,7 @@ export default function SubmitPaper() {
           <button
             type="submit"
             className="btn btn--primary btn--lg"
-            disabled={loading}
+            disabled={loading || !selectedConf}
             id="submit-paper-btn"
             style={{ width: "100%" }}
           >

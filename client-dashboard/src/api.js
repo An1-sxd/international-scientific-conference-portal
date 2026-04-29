@@ -76,7 +76,8 @@ export const confirmRegistration = (id) =>
   request(`/registrations/${id}/confirm`, { method: "PATCH" });
 
 // ─── Participants ───
-export const fetchParticipants = () => request("/participants");
+export const fetchParticipants = (conferenceId) =>
+  request(`/participants?conferenceId=${conferenceId}`);
 export const updateParticipant = (id, body) =>
   request(`/participants/${id}`, { method: "PUT", body: JSON.stringify(body) });
 export const deleteParticipant = (id) =>
@@ -91,3 +92,9 @@ export const generateCertificatesBatch = (conferenceId) =>
   request(`/certificates/generate-batch?conferenceId=${conferenceId}`, { method: "POST" });
 export const uploadCertificatePdf = (id, formData) =>
   request(`/certificates/${id}/upload-pdf`, { method: "PATCH", body: formData });
+export const generateCertificatePdf = (id) =>
+  request(`/certificates/${id}/generate-pdf`, { method: "POST" });
+
+// ─── Researches ───
+export const fetchResearches = (conferenceId) =>
+  request(`/researches?conferenceId=${conferenceId}`);

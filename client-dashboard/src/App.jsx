@@ -9,6 +9,7 @@ import Themes from './pages/Themes';
 import Registrations from './pages/Registrations';
 import Participants from './pages/Participants';
 import Submissions from './pages/Submissions';
+import Researches from './pages/Researches';
 import Certificates from './pages/Certificates';
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/registrations" element={<Registrations />} />
             <Route path="/participants" element={<Participants />} />
             <Route path="/submissions" element={<Submissions />} />
+            <Route path="/researches" element={<Researches />} />
             <Route path="/certificates" element={<Certificates />} />
           </Routes>
         </div>

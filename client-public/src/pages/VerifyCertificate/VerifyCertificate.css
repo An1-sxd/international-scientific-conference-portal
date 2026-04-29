@@ -47,3 +47,97 @@
   flex-direction: column;
   gap: var(--sp-sm);
 }
+
+.verify-result__actions {
+  display: flex;
+  gap: var(--sp-md);
+  margin-top: var(--sp-xl);
+  justify-content: center;
+}
+
+/* ── My Certificates Section ── */
+.my-certs {
+  margin-top: var(--sp-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-lg);
+}
+
+.cert-entry {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.cert-entry:hover {
+  border-color: var(--clr-primary);
+}
+
+.cert-entry__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--sp-lg);
+  background: rgba(99,102,241,0.04);
+  border-bottom: 1px solid var(--clr-border);
+  gap: var(--sp-md);
+}
+.cert-entry__conf h3 {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+.cert-entry__meta {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-dim);
+}
+
+.cert-entry__body {
+  padding: var(--sp-lg);
+}
+.cert-entry__body--pending {
+  text-align: center;
+  color: var(--clr-text-muted);
+  font-size: var(--fs-sm);
+}
+.cert-entry__body--pending p {
+  margin: 0;
+  padding: var(--sp-md) 0;
+}
+
+.cert-entry__info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-md);
+  margin-bottom: var(--sp-lg);
+}
+.cert-entry__label {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.cert-entry__value {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.cert-entry__actions {
+  display: flex;
+  gap: var(--sp-md);
+  justify-content: center;
+  padding-top: var(--sp-md);
+  border-top: 1px solid var(--clr-border);
+}
+
+@media (max-width: 600px) {
+  .cert-entry__header { flex-direction: column; }
+  .cert-entry__info-grid { grid-template-columns: 1fr; }
+  .cert-entry__actions { flex-direction: column; }
+  .verify-result__actions { flex-direction: column; }
+}

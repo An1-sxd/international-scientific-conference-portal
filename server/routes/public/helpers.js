@@ -175,6 +175,7 @@ export const pickCertificateCheck = (certificate) => ({
   status: certificate.status,
   issueDate: certificate.issueDate,
   ownerName: certificate.ownerName,
+  pdfUrl: certificate.pdfUrl || null,
   conference: certificate.conferenceId
     ? {
         id: certificate.conferenceId._id,

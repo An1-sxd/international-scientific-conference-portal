@@ -9,6 +9,7 @@ import statsRoute from "./public/stats.route.js";
 import speakerByIdRoute from "./public/speakerById.route.js";
 import speakersRoute from "./public/speakers.route.js";
 import registerRoute from "./public/register.route.js";
+import registrationTrackRoute from "./public/registrationTrack.route.js";
 import submissionStatusRoute from "./public/submissionStatus.route.js";
 import submitPaperRoute from "./public/submitPaper.route.js";
 import themesRoute from "./public/themes.route.js";
@@ -26,6 +27,7 @@ router.use(agendaCurrentRoute);
 router.use(submitPaperRoute);
 router.use(submissionStatusRoute);
 router.use(registerRoute);
+router.use(registrationTrackRoute);
 router.use(certificateCheckRoute);
 
 export default router;

@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import Topbar from '../components/Topbar';
+import ConferenceSelector from '../components/ConferenceSelector';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
+import { useConference } from '../components/ConferenceProvider';
 import { fetchParticipants, updateParticipant, deleteParticipant } from '../api';
 
 const TYPES = ['STUDENT', 'RESEARCHER', 'PROFESSOR', 'GUEST', 'INDUSTRY'];
 
 export default function Participants() {
+  const { selectedId } = useConference();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
@@ -16,8 +19,15 @@ export default function Participants() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
 
-  const load = () => { setLoading(true); fetchParticipants().then((r) => setItems(r.data)).catch(() => setItems([])).finally(() => setLoading(false)); };
-  useEffect(() => { load(); }, []);
+  const load = () => {
+    if (!selectedId) return;
+    setLoading(true);
+    fetchParticipants(selectedId)
+      .then((r) => setItems(r.data))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  };
+  useEffect(() => { load(); }, [selectedId]);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -48,11 +58,11 @@ export default function Participants() {
 
   return (
     <>
-      <Topbar title="Participants" />
+      <Topbar title="Participants"><ConferenceSelector /></Topbar>
       <div className="page-content fade-in">
         <div className="table-wrap">
           <div className="table-toolbar">
-            <span className="table-toolbar__title">Participants ({items.length})</span>
+            <span className="table-toolbar__title">Participants ({filtered.length})</span>
             <div className="table-toolbar__actions">
               <select className="conf-select" style={{ minWidth: 130 }} value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
                 <option value="ALL">All Types</option>
@@ -66,11 +76,11 @@ export default function Participants() {
           {loading ? (
             <div className="loader-wrap"><div className="loader" /></div>
           ) : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">👥</div><div className="empty-state__title">No participants</div></div>
+            <div className="empty-state"><div className="empty-state__icon">👥</div><div className="empty-state__title">No participants for this conference</div></div>
           ) : (
             <table>
               <thead>
-                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Affiliation</th><th>Country</th><th>Type</th><th>Actions</th></tr>
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Affiliation</th><th>Country</th><th>Type</th><th>Reg Status</th><th>Present</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {filtered.map((p) => (
@@ -81,6 +91,16 @@ export default function Participants() {
                     <td>{p.affiliation || '—'}</td>
                     <td>{p.country || '—'}</td>
                     <td><span className="badge badge--accent">{p.participantType}</span></td>
+                    <td>
+                      <span className={`badge badge--${p.registrationStatus === 'CONFIRMED' ? 'success' : p.registrationStatus === 'CANCELLED' ? 'danger' : 'warning'}`}>
+                        {p.registrationStatus}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge badge--${p.attendanceConfirmed ? 'success' : 'neutral'}`}>
+                        {p.attendanceConfirmed ? '✓ Yes' : 'No'}
+                      </span>
+                    </td>
                     <td>
                       <div style={{ display: 'flex', gap: '0.4rem' }}>
                         <button className="btn btn--ghost btn--sm" onClick={() => openEdit(p)}>Edit</button>

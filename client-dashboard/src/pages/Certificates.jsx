@@ -3,7 +3,7 @@ import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
-import { fetchCertificates, generateCertificatesBatch, uploadCertificatePdf } from '../api';
+import { fetchCertificates, generateCertificatesBatch, uploadCertificatePdf, generateCertificatePdf } from '../api';
 
 export default function Certificates() {
   const { selectedId } = useConference();
@@ -13,6 +13,7 @@ export default function Certificates() {
   const [search, setSearch] = useState('');
   const [generating, setGenerating] = useState(false);
   const [uploading, setUploading] = useState(null);
+  const [generatingPdf, setGeneratingPdf] = useState(null);
 
   const load = () => {
     if (!selectedId) return;
@@ -48,6 +49,16 @@ export default function Certificates() {
     finally { setUploading(null); }
   };
 
+  const handleGeneratePdf = async (certId) => {
+    setGeneratingPdf(certId);
+    try {
+      await generateCertificatePdf(certId);
+      setToast({ msg: 'Certificate PDF generated & uploaded to CDN!', type: 'success' });
+      load();
+    } catch (e) { setToast({ msg: e.message, type: 'error' }); }
+    finally { setGeneratingPdf(null); }
+  };
+
   const statusBadge = (s) => {
     const m = { GENERATED: 'warning', ISSUED: 'success', DOWNLOADED: 'primary', REVOKED: 'danger' };
     return m[s] || 'neutral';
@@ -62,13 +73,13 @@ export default function Certificates() {
     <>
       <Topbar title="Certificates"><ConferenceSelector /></Topbar>
       <div className="page-content fade-in">
-        {/* Template Upload Section */}
+        {/* Actions bar */}
         <div className="table-wrap" style={{ marginBottom: 'var(--sp-xl)' }}>
           <div className="table-toolbar">
             <div>
               <span className="table-toolbar__title">Certificate Management</span>
               <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--clr-text-muted)', marginTop: 4 }}>
-                Upload your certificate template per conference. Certificates will be generated for attendees marked as present.
+                Mark participants as present in the Registrations page, then generate certificates. PDFs are auto-generated and stored on CDN.
               </p>
             </div>
             <div className="table-toolbar__actions">
@@ -83,7 +94,7 @@ export default function Certificates() {
           </div>
         </div>
 
-        {/* Certificates Table */}
+        {/* Table */}
         <div className="table-wrap">
           <div className="table-toolbar">
             <span className="table-toolbar__title">Generated Certificates ({items.length})</span>
@@ -129,18 +140,27 @@ export default function Certificates() {
                     <td>{new Date(c.issueDate).toLocaleDateString()}</td>
                     <td>
                       {c.pdfUrl ? (
-                        <a href={c.pdfUrl} target="_blank" rel="noreferrer" className="btn btn--success btn--sm">Download</a>
+                        <a href={c.pdfUrl} target="_blank" rel="noreferrer" className="btn btn--success btn--sm">View / Download</a>
                       ) : (
-                        <label className="btn btn--outline btn--sm" style={{ cursor: 'pointer' }}>
-                          {uploading === c._id ? 'Uploading…' : 'Upload PDF'}
-                          <input
-                            type="file"
-                            accept=".pdf"
-                            style={{ display: 'none' }}
-                            onChange={(e) => { if (e.target.files[0]) handleUpload(c._id, e.target.files[0]); }}
-                            disabled={uploading === c._id}
-                          />
-                        </label>
+                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                          <button
+                            className="btn btn--primary btn--sm"
+                            onClick={() => handleGeneratePdf(c._id)}
+                            disabled={generatingPdf === c._id}
+                          >
+                            {generatingPdf === c._id ? 'Generating…' : '⚡ Auto Generate'}
+                          </button>
+                          <label className="btn btn--outline btn--sm" style={{ cursor: 'pointer' }}>
+                            {uploading === c._id ? 'Uploading…' : '📎 Upload'}
+                            <input
+                              type="file"
+                              accept=".pdf"
+                              style={{ display: 'none' }}
+                              onChange={(e) => { if (e.target.files[0]) handleUpload(c._id, e.target.files[0]); }}
+                              disabled={uploading === c._id}
+                            />
+                          </label>
+                        </div>
                       )}
                     </td>
                   </tr>

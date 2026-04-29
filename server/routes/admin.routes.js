@@ -9,6 +9,7 @@ import submissionsRoute from "./admin/submissions.route.js";
 import registrationsRoute from "./admin/registrations.route.js";
 import participantsRoute from "./admin/participants.route.js";
 import certificatesRoute from "./admin/certificates.route.js";
+import researchesRoute from "./admin/researches.route.js";
 
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router.use(submissionsRoute);
 router.use(registrationsRoute);
 router.use(participantsRoute);
 router.use(certificatesRoute);
+router.use(researchesRoute);
 
 export default router;
