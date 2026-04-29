@@ -18,7 +18,6 @@ export default function Participants() {
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
-  const [presenceFilter, setPresenceFilter] = useState('ALL');
 
   const load = () => {
     if (!selectedId) return;
@@ -46,7 +45,7 @@ export default function Participants() {
   };
 
   const remove = async (id) => {
-    if (!confirm('Delete this participant?')) return;
+    if (!confirm('Delete this participant and all related data?')) return;
     try { await deleteParticipant(id); load(); setToast({ msg: 'Participant deleted.', type: 'success' }); } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
@@ -64,11 +63,6 @@ export default function Participants() {
   const filtered = items
     .filter((p) => typeFilter === 'ALL' || p.participantType === typeFilter)
     .filter((p) => {
-      if (presenceFilter === 'PRESENT') return p.attendanceConfirmed;
-      if (presenceFilter === 'ABSENT') return !p.attendanceConfirmed;
-      return true;
-    })
-    .filter((p) => {
       const q = search.toLowerCase();
       return p.fullName.toLowerCase().includes(q) || p.email.toLowerCase().includes(q);
     });
@@ -79,41 +73,15 @@ export default function Participants() {
     <>
       <Topbar title="Participants"><ConferenceSelector /></Topbar>
       <div className="page-content fade-in">
-        {/* Summary bar */}
-        <div className="table-wrap" style={{ marginBottom: 'var(--sp-xl)' }}>
-          <div className="table-toolbar">
-            <div>
-              <span className="table-toolbar__title">Presence Overview</span>
-              <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--clr-text-muted)', marginTop: 4 }}>
-                Mark participants as present using the checkboxes below. Certificates will only be available for present participants.
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 'var(--sp-lg)', alignItems: 'center' }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 'var(--fs-2xl)', fontWeight: 700, color: 'var(--clr-success)' }}>{presentCount}</div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--clr-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Present</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 'var(--fs-2xl)', fontWeight: 700, color: 'var(--clr-text-muted)' }}>{items.length - presentCount}</div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--clr-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Absent</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 'var(--fs-2xl)', fontWeight: 700 }}>{items.length}</div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--clr-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="table-wrap">
           <div className="table-toolbar">
-            <span className="table-toolbar__title">Participants ({filtered.length})</span>
+            <div>
+              <span className="table-toolbar__title">Accepted Participants ({filtered.length})</span>
+              <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--clr-text-muted)', marginTop: 4 }}>
+                {presentCount} present · {items.length - presentCount} absent · {items.length} total
+              </p>
+            </div>
             <div className="table-toolbar__actions">
-              <select className="conf-select" style={{ minWidth: 130 }} value={presenceFilter} onChange={(e) => setPresenceFilter(e.target.value)}>
-                <option value="ALL">All Presence</option>
-                <option value="PRESENT">Present Only</option>
-                <option value="ABSENT">Absent Only</option>
-              </select>
               <select className="conf-select" style={{ minWidth: 130 }} value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
                 <option value="ALL">All Types</option>
                 {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -126,33 +94,23 @@ export default function Participants() {
           {loading ? (
             <div className="loader-wrap"><div className="loader" /></div>
           ) : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">👥</div><div className="empty-state__title">No participants for this conference</div></div>
+            <div className="empty-state"><div className="empty-state__icon">👥</div><div className="empty-state__title">No accepted participants for this conference</div></div>
           ) : (
             <table>
               <thead>
                 <tr>
+                  <th style={{ textAlign: 'center', width: 70 }}>Present</th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>Affiliation</th>
                   <th>Type</th>
-                  <th>Reg Status</th>
-                  <th style={{ textAlign: 'center' }}>Present</th>
-                  <th>Certificate</th>
+                  <th>Reg ID</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((p) => (
                   <tr key={p._id}>
-                    <td><strong>{p.fullName}</strong></td>
-                    <td>{p.email}</td>
-                    <td>{p.affiliation || '—'}</td>
-                    <td><span className="badge badge--accent">{p.participantType}</span></td>
-                    <td>
-                      <span className={`badge badge--${p.registrationStatus === 'CONFIRMED' ? 'success' : p.registrationStatus === 'CANCELLED' ? 'danger' : 'warning'}`}>
-                        {p.registrationStatus}
-                      </span>
-                    </td>
                     <td style={{ textAlign: 'center' }}>
                       <input
                         type="checkbox"
@@ -162,11 +120,11 @@ export default function Participants() {
                         title={p.attendanceConfirmed ? 'Mark as absent' : 'Mark as present'}
                       />
                     </td>
-                    <td>
-                      <span className={`badge badge--${p.attendanceConfirmed ? 'success' : 'neutral'}`}>
-                        {p.attendanceConfirmed ? '✓ Ready' : 'Not Ready'}
-                      </span>
-                    </td>
+                    <td><strong>{p.fullName}</strong></td>
+                    <td>{p.email}</td>
+                    <td>{p.affiliation || '—'}</td>
+                    <td><span className="badge badge--accent">{p.participantType}</span></td>
+                    <td><span className="badge badge--neutral">{p.registrationId}</span></td>
                     <td>
                       <div style={{ display: 'flex', gap: '0.4rem' }}>
                         <button className="btn btn--ghost btn--sm" onClick={() => openEdit(p)}>Edit</button>

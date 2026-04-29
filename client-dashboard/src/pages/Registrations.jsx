@@ -5,7 +5,7 @@ import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchRegistrations, updateRegistrationStatus } from '../api';
 
-const STATUSES = ['REGISTERED', 'CONFIRMED', 'CANCELLED'];
+const STATUSES = ['PENDING', 'ACCEPTED', 'REFUSED'];
 
 export default function Registrations() {
   const { selectedId } = useConference();
@@ -43,7 +43,7 @@ export default function Registrations() {
     });
 
   const statusBadge = (s) => {
-    const m = { REGISTERED: 'warning', CONFIRMED: 'success', CANCELLED: 'danger' };
+    const m = { PENDING: 'warning', ACCEPTED: 'success', REFUSED: 'danger' };
     return m[s] || 'neutral';
   };
 
@@ -77,7 +77,6 @@ export default function Registrations() {
                   <th>Email</th>
                   <th>Type</th>
                   <th>Status</th>
-                  <th>Present</th>
                   <th>Date</th>
                   <th>Actions</th>
                 </tr>
@@ -90,11 +89,6 @@ export default function Registrations() {
                     <td>{r.participantId?.email || '—'}</td>
                     <td><span className="badge badge--accent">{r.participantId?.participantType || '—'}</span></td>
                     <td><span className={`badge badge--${statusBadge(r.registrationStatus)}`}>{r.registrationStatus}</span></td>
-                    <td>
-                      <span className={`badge badge--${r.attendanceConfirmed ? 'success' : 'neutral'}`}>
-                        {r.attendanceConfirmed ? '✓ Yes' : 'No'}
-                      </span>
-                    </td>
                     <td>{new Date(r.registeredAt).toLocaleDateString()}</td>
                     <td>
                       <select

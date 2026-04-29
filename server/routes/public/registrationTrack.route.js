@@ -50,7 +50,6 @@ router.get("/registrations/track", async (req, res) => {
     const data = registrations.map((reg) => ({
       registrationId: reg.registrationId,
       registrationStatus: reg.registrationStatus,
-      attendanceConfirmed: reg.attendanceConfirmed,
       registeredAt: reg.registeredAt,
       participant: reg.participantId
         ? {

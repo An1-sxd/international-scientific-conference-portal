@@ -27,7 +27,7 @@ const registrationSchema = new mongoose.Schema(
     registrationStatus: {
       type: String,
       enum: REGISTRATION_STATUSES,
-      default: "REGISTERED",
+      default: "PENDING",
       index: true,
     },
     attendanceConfirmed: {

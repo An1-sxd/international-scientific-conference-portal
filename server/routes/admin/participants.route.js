@@ -2,6 +2,8 @@ import express from "express";
 
 import Participant from "../../models/participant.model.js";
 import Registration from "../../models/registration.model.js";
+import Certificate from "../../models/certificate.model.js";
+import { deleteAsset } from "../../services/cloudinary.service.js";
 import { handleModelError, resolveConference, sendError, isValidObjectId } from "../public/helpers.js";
 
 const router = express.Router();
@@ -12,10 +14,10 @@ router.get("/participants", async (req, res) => {
     const { conference, status, message } = await resolveConference(req);
     if (!conference) return sendError(res, status, message);
 
-    // Find all registrations (not cancelled) for this conference
+    // Find only ACCEPTED registrations for this conference
     const registrations = await Registration.find({
       conferenceId: conference._id,
-      registrationStatus: { $ne: "CANCELLED" },
+      registrationStatus: "ACCEPTED",
     }).populate("participantId");
 
     // Extract unique participants
@@ -80,10 +82,27 @@ router.delete("/participants/:id", async (req, res) => {
     const { id } = req.params;
     if (!isValidObjectId(id)) return sendError(res, 400, "Invalid participant ID.");
 
-    const participant = await Participant.findByIdAndDelete(id);
+    const participant = await Participant.findById(id);
     if (!participant) return sendError(res, 404, "Participant not found.");
 
-    return res.json({ success: true, message: "Participant deleted successfully." });
+    // 1. Clean up certificate PDFs from Cloudinary
+    const certificates = await Certificate.find({ participantId: id });
+    for (const cert of certificates) {
+      if (cert.pdfPublicId) {
+        await deleteAsset(cert.pdfPublicId);
+      }
+    }
+
+    // 2. Delete all certificates for this participant
+    await Certificate.deleteMany({ participantId: id });
+
+    // 3. Delete all registrations for this participant
+    await Registration.deleteMany({ participantId: id });
+
+    // 4. Delete the participant
+    await participant.deleteOne();
+
+    return res.json({ success: true, message: "Participant and all related data deleted successfully." });
   } catch (error) {
     return handleModelError(res, error);
   }

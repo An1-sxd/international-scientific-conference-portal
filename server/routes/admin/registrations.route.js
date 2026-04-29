@@ -53,29 +53,4 @@ router.patch("/registrations/:id/status", async (req, res) => {
   }
 });
 
-router.patch("/registrations/:id/confirm", async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!isValidObjectId(id)) return sendError(res, 400, "Invalid registration ID.");
-
-    const updates = {
-      registrationStatus: "CONFIRMED",
-      attendanceConfirmed: true
-    };
-
-    const registration = await Registration.findByIdAndUpdate(id, updates, {
-      new: true,
-      runValidators: true,
-    })
-      .populate("participantId")
-      .populate("conferenceId");
-
-    if (!registration) return sendError(res, 404, "Registration not found.");
-
-    return res.json({ success: true, data: registration });
-  } catch (error) {
-    return handleModelError(res, error);
-  }
-});
-
 export default router;

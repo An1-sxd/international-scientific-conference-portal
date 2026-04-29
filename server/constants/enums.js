@@ -7,9 +7,9 @@ export const SUBMISSION_STATUSES = [
 ];
 
 export const REGISTRATION_STATUSES = [
-  "REGISTERED",
-  "CONFIRMED",
-  "CANCELLED",
+  "PENDING",
+  "ACCEPTED",
+  "REFUSED",
 ];
 
 export const CERTIFICATE_STATUSES = [

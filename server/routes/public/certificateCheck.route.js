@@ -105,19 +105,18 @@ router.get("/certificates/my", async (req, res) => {
         endDate: reg.conferenceId?.endDate,
         registrationId: reg.registrationId,
         registrationStatus: reg.registrationStatus,
-        attendanceConfirmed: reg.attendanceConfirmed,
         certificateStatus: null,
         certificate: null,
       };
 
-      if (reg.registrationStatus === "CANCELLED") {
-        // Registration was cancelled — not accepted
+      if (reg.registrationStatus === "REFUSED") {
+        // Registration was refused — not accepted
         entry.certificateStatus = "not_accepted";
-      } else if (!reg.attendanceConfirmed) {
-        // Accepted but not yet marked as present
+      } else if (reg.registrationStatus === "PENDING") {
+        // Still pending review
         entry.certificateStatus = "not_ready";
       } else {
-        // Accepted and present — certificate is ready
+        // Accepted — certificate is ready
         entry.certificateStatus = "ready";
 
         // Find or create certificate record

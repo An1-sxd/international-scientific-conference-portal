@@ -3,9 +3,9 @@ import { trackRegistration } from "../../api";
 import "./TrackRegistration.css";
 
 const STATUS_STYLE = {
-  REGISTERED: "badge--warning",
-  CONFIRMED: "badge--success",
-  CANCELLED: "badge--danger",
+  PENDING: "badge--warning",
+  ACCEPTED: "badge--success",
+  REFUSED: "badge--danger",
 };
 
 export default function TrackRegistration() {
@@ -132,10 +132,8 @@ export default function TrackRegistration() {
                         <span className="reg-entry__value">{r.participant?.fullName}</span>
                       </div>
                       <div>
-                        <span className="reg-entry__label">Attendance</span>
-                        <span className={`badge ${r.attendanceConfirmed ? "badge--success" : "badge--neutral"}`}>
-                          {r.attendanceConfirmed ? "Present ✓" : "Not yet"}
-                        </span>
+                        <span className="reg-entry__label">Type</span>
+                        <span className="reg-entry__value">{r.participant?.participantType || '—'}</span>
                       </div>
                     </div>
                   </div>

@@ -72,8 +72,6 @@ export const fetchRegistrations = (conferenceId) =>
   request(`/registrations?conferenceId=${conferenceId}`);
 export const updateRegistrationStatus = (id, body) =>
   request(`/registrations/${id}/status`, { method: "PATCH", body: JSON.stringify(body) });
-export const confirmRegistration = (id) =>
-  request(`/registrations/${id}/confirm`, { method: "PATCH" });
 
 // ─── Participants ───
 export const fetchParticipants = (conferenceId) =>

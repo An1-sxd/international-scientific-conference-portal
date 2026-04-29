@@ -128,10 +128,10 @@ export default function VerifyCertificate() {
                       <div className="cert-status-msg cert-status-msg--danger">
                         <span className="cert-status-msg__icon">✕</span>
                         <div>
-                          <strong>Registration Cancelled</strong>
+                          <strong>Registration Refused</strong>
                           <p>
-                            Your registration for this conference has been cancelled.
-                            You are not accepted in this conference.
+                            Your registration for this conference has been refused.
+                            You are not eligible for a certificate.
                           </p>
                         </div>
                       </div>
@@ -143,10 +143,9 @@ export default function VerifyCertificate() {
                         <div>
                           <strong>Certificate Not Ready</strong>
                           <p>
-                            Your registration is confirmed, but your attendance has
-                            not been marked yet. Your certificate will be available
-                            once the organizer confirms your presence at the
-                            conference.
+                            Your registration is still pending review.
+                            Your certificate will be available once the organizer
+                            accepts your registration.
                           </p>
                         </div>
                       </div>
@@ -159,7 +158,7 @@ export default function VerifyCertificate() {
                           <div>
                             <strong>Certificate Ready!</strong>
                             <p>
-                              Your attendance has been confirmed. Your certificate is
+                              Your registration has been accepted. Your certificate is
                               ready to view and download.
                             </p>
                           </div>

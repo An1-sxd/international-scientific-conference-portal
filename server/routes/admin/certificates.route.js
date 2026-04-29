@@ -40,8 +40,8 @@ router.post("/certificates/generate", async (req, res) => {
       return sendError(res, 404, "Registration not found.");
     }
     
-    if (registration.registrationStatus !== "CONFIRMED" && !registration.attendanceConfirmed) {
-      return sendError(res, 400, "Cannot generate certificate: attendance is not confirmed.");
+    if (registration.registrationStatus !== "ACCEPTED") {
+      return sendError(res, 400, "Cannot generate certificate: registration is not accepted.");
     }
 
     // Check if certificate already exists for this registration
@@ -84,7 +84,7 @@ router.post("/certificates/generate-batch", async (req, res) => {
     // Find all confirmed registrations that don't yet have certificates
     const confirmedRegistrations = await Registration.find({
       conferenceId: conference._id,
-      attendanceConfirmed: true,
+      registrationStatus: "ACCEPTED",
     }).populate("participantId");
 
     const results = { generated: 0, skipped: 0, errors: [] };
