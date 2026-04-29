@@ -1,30 +1,40 @@
 import express from "express";
 
 import Theme from "../../models/theme.model.js";
-import { handleModelError, resolveConference, sendError } from "./helpers.js";
+import Conference from "../../models/conference.model.js";
+import { handleModelError, isValidObjectId, sendError } from "./helpers.js";
 
 const router = express.Router();
 
 router.get("/themes", async (req, res) => {
   try {
-    const { conference, status, message } = await resolveConference(req);
-    if (!conference) {
-      return sendError(res, status, message);
+    const conferenceId =
+      typeof req.query?.conferenceId === "string" ? req.query.conferenceId.trim() : "";
+
+    const query = {};
+    let conference = null;
+
+    if (conferenceId) {
+      if (!isValidObjectId(conferenceId)) {
+        return sendError(res, 400, "Invalid conferenceId.");
+      }
+      conference = await Conference.findById(conferenceId);
+      if (!conference) {
+        return sendError(res, 404, "Conference not found.");
+      }
+      query.conferenceId = conference._id;
     }
 
-    const themes = await Theme.find({ conferenceId: conference._id }).sort({
-      displayOrder: 1,
-      label: 1,
-    });
+    const themes = await Theme.find(query)
+      .populate("conferenceId", "name")
+      .sort({ displayOrder: 1, label: 1 });
 
-    return res.json({
-      success: true,
-      data: themes,
-      conference: {
-        id: conference._id,
-        name: conference.name,
-      },
-    });
+    const response = { success: true, data: themes };
+    if (conference) {
+      response.conference = { id: conference._id, name: conference.name };
+    }
+
+    return res.json(response);
   } catch (error) {
     return handleModelError(res, error);
   }
