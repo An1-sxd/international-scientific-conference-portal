@@ -2,15 +2,31 @@ import express from "express";
 
 import Registration from "../../models/registration.model.js";
 import Certificate from "../../models/certificate.model.js";
-import { handleModelError, sendError, isValidObjectId } from "../public/helpers.js";
+import { handleModelError, resolveConference, sendError, isValidObjectId } from "../public/helpers.js";
 import { uploadPdf } from "../../middlewares/upload.middleware.js";
 import { uploadBuffer, deleteAsset } from "../../services/cloudinary.service.js";
 
 const router = express.Router();
 
+router.get("/certificates", async (req, res) => {
+  try {
+    const { conference, status, message } = await resolveConference(req);
+    if (!conference) return sendError(res, status, message);
+
+    const certificates = await Certificate.find({ conferenceId: conference._id })
+      .populate("participantId")
+      .populate("conferenceId")
+      .populate("registrationIdRef")
+      .sort({ issueDate: -1 });
+
+    return res.json({ success: true, data: certificates });
+  } catch (error) {
+    return handleModelError(res, error);
+  }
+});
+
 router.post("/certificates/generate", async (req, res) => {
   try {
-    console.log(req.body)
     const { registrationIdRef } = req.body;
 
     if (!registrationIdRef || !isValidObjectId(registrationIdRef)) {
@@ -46,7 +62,7 @@ router.post("/certificates/generate", async (req, res) => {
       participantId: participant._id,
       ownerName: participant.fullName,
       ownerEmail: participant.email,
-      certificateType: "PARTICIPANT", // Could be dynamic if needed
+      certificateType: "PARTICIPANT",
       status: "GENERATED",
     };
 
@@ -54,6 +70,56 @@ router.post("/certificates/generate", async (req, res) => {
     await certificate.save();
 
     return res.status(201).json({ success: true, data: certificate });
+  } catch (error) {
+    return handleModelError(res, error);
+  }
+});
+
+router.post("/certificates/generate-batch", async (req, res) => {
+  try {
+    const { conference, status, message } = await resolveConference(req);
+    if (!conference) return sendError(res, status, message);
+
+    // Find all confirmed registrations that don't yet have certificates
+    const confirmedRegistrations = await Registration.find({
+      conferenceId: conference._id,
+      attendanceConfirmed: true,
+    }).populate("participantId");
+
+    const results = { generated: 0, skipped: 0, errors: [] };
+
+    for (const reg of confirmedRegistrations) {
+      try {
+        const existingCert = await Certificate.findOne({ registrationIdRef: reg._id });
+        if (existingCert) {
+          results.skipped++;
+          continue;
+        }
+
+        const participant = reg.participantId;
+        if (!participant) {
+          results.errors.push(`Missing participant for registration ${reg.registrationId}`);
+          continue;
+        }
+
+        const cert = new Certificate({
+          conferenceId: reg.conferenceId,
+          registrationIdRef: reg._id,
+          participantId: participant._id,
+          ownerName: participant.fullName,
+          ownerEmail: participant.email,
+          certificateType: "PARTICIPANT",
+          status: "GENERATED",
+        });
+
+        await cert.save();
+        results.generated++;
+      } catch (err) {
+        results.errors.push(err.message);
+      }
+    }
+
+    return res.json({ success: true, data: results });
   } catch (error) {
     return handleModelError(res, error);
   }
@@ -77,7 +143,7 @@ router.patch("/certificates/:id/upload-pdf", uploadPdf("pdf"), async (req, res) 
     
     certificate.pdfUrl = uploadResult.url;
     certificate.pdfPublicId = uploadResult.publicId;
-    certificate.status = "ISSUED"; // Mark as issued once PDF is attached
+    certificate.status = "ISSUED";
 
     await certificate.save();
 
