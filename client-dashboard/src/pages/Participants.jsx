@@ -3,6 +3,7 @@ import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchParticipants, updateParticipant, deleteParticipant, updateRegistrationStatus } from '../api';
 import { Users } from 'lucide-react';
@@ -19,6 +20,8 @@ export default function Participants() {
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
+  const [confirmTarget, setConfirmTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = () => {
     if (!selectedId) return;
@@ -45,9 +48,16 @@ export default function Participants() {
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
-  const remove = async (id) => {
-    if (!confirm('Delete this participant and all related data?')) return;
-    try { await deleteParticipant(id); load(); setToast({ msg: 'Participant deleted.', type: 'success' }); } catch (e) { setToast({ msg: e.message, type: 'error' }); }
+  const remove = async () => {
+    if (!confirmTarget) return;
+    setDeleting(true);
+    try {
+      await deleteParticipant(confirmTarget);
+      setConfirmTarget(null);
+      load();
+      setToast({ msg: 'Participant deleted.', type: 'success' });
+    } catch (e) { setToast({ msg: e.message, type: 'error' }); }
+    finally { setDeleting(false); }
   };
 
   const togglePresence = async (p) => {
@@ -129,7 +139,7 @@ export default function Participants() {
                     <td>
                       <div style={{ display: 'flex', gap: '0.4rem' }}>
                         <button className="btn btn--ghost btn--sm" onClick={() => openEdit(p)}>Edit</button>
-                        <button className="btn btn--danger btn--sm" onClick={() => remove(p._id)}>Delete</button>
+                        <button className="btn btn--danger btn--sm" onClick={() => setConfirmTarget(p._id)}>Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -160,6 +170,16 @@ export default function Participants() {
             </div>
           </div>
         </Modal>
+      )}
+      {confirmTarget && (
+        <ConfirmModal
+          title="Delete Participant"
+          message="Are you sure you want to delete this participant and all related data? This action cannot be undone."
+          confirmText="Delete"
+          loading={deleting}
+          onConfirm={remove}
+          onCancel={() => setConfirmTarget(null)}
+        />
       )}
       {toast && <Toast key={Date.now()} message={toast.msg} type={toast.type} />}
     </>

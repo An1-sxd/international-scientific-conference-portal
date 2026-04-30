@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Topbar from '../components/Topbar';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchConferences as apiFetch, createConference, updateConference, deleteConference } from '../api';
 import { Building2 } from 'lucide-react';
@@ -17,6 +18,8 @@ export default function Conferences() {
   const [editId, setEditId] = useState(null);
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
+  const [confirmTarget, setConfirmTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = () => apiFetch().then((r) => setItems(r.data)).finally(() => setLoading(false));
   useEffect(() => { load(); }, []);
@@ -41,14 +44,17 @@ export default function Conferences() {
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
-  const remove = async (id) => {
-    if (!confirm('Delete this conference?')) return;
+  const remove = async () => {
+    if (!confirmTarget) return;
+    setDeleting(true);
     try {
-      await deleteConference(id);
+      await deleteConference(confirmTarget);
+      setConfirmTarget(null);
       await load();
       await refresh();
       setToast({ msg: 'Conference deleted.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
+    finally { setDeleting(false); }
   };
 
   const filtered = items.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
@@ -82,7 +88,7 @@ export default function Conferences() {
                     <td>
                       <div style={{display:'flex',gap:'0.4rem'}}>
                         <button className="btn btn--ghost btn--sm" onClick={() => openEdit(c)}>Edit</button>
-                        <button className="btn btn--danger btn--sm" onClick={() => remove(c._id)}>Delete</button>
+                        <button className="btn btn--danger btn--sm" onClick={() => setConfirmTarget(c._id)}>Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -115,6 +121,16 @@ export default function Conferences() {
             <label className="form-checkbox"><input type="checkbox" checked={form.isActive} onChange={(e) => set('isActive', e.target.checked)} /> Active</label>
           </div>
         </Modal>
+      )}
+      {confirmTarget && (
+        <ConfirmModal
+          title="Delete Conference"
+          message="Are you sure you want to delete this conference? All related data (sessions, themes, registrations, etc.) may be affected. This action cannot be undone."
+          confirmText="Delete"
+          loading={deleting}
+          onConfirm={remove}
+          onCancel={() => setConfirmTarget(null)}
+        />
       )}
       {toast && <Toast key={Date.now()} message={toast.msg} type={toast.type} />}
     </>

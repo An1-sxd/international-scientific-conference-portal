@@ -473,6 +473,30 @@ td strong { color: var(--clr-text); font-weight: 600; }
 .toast--success { background: var(--clr-success); color: #fff; }
 .toast--error { background: var(--clr-danger); color: #fff; }
 
+/* ── Confirm Modal ──────────────────────────────────── */
+.confirm-modal { max-width: 440px; }
+.confirm-modal__content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-md);
+  padding: var(--sp-sm) 0;
+}
+.confirm-modal__icon {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-lg);
+  background: rgba(239, 68, 68, .12);
+  color: var(--clr-danger);
+}
+.confirm-modal__message {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-dim);
+  line-height: 1.6;
+}
+
 /* ── Animations ─────────────────────────────────────── */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }

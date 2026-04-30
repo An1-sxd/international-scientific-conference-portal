@@ -3,6 +3,7 @@ import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchThemes, createTheme, updateTheme, deleteTheme } from '../api';
 import { Tag } from 'lucide-react';
@@ -17,6 +18,8 @@ export default function Themes() {
   const [form, setForm] = useState(empty);
   const [editId, setEditId] = useState(null);
   const [toast, setToast] = useState(null);
+  const [confirmTarget, setConfirmTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = () => { if (!selectedId) return; setLoading(true); fetchThemes(selectedId).then((r) => setItems(r.data)).catch(() => setItems([])).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, [selectedId]);
@@ -34,9 +37,16 @@ export default function Themes() {
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
-  const remove = async (id) => {
-    if (!confirm('Delete this theme?')) return;
-    try { await deleteTheme(id); load(); setToast({ msg: 'Theme deleted.', type: 'success' }); } catch (e) { setToast({ msg: e.message, type: 'error' }); }
+  const remove = async () => {
+    if (!confirmTarget) return;
+    setDeleting(true);
+    try {
+      await deleteTheme(confirmTarget);
+      setConfirmTarget(null);
+      load();
+      setToast({ msg: 'Theme deleted.', type: 'success' });
+    } catch (e) { setToast({ msg: e.message, type: 'error' }); }
+    finally { setDeleting(false); }
   };
 
   return (
@@ -62,7 +72,7 @@ export default function Themes() {
                     <td><span className="badge badge--accent">{t.code}</span></td>
                     <td><strong>{t.label}</strong></td>
                     <td style={{maxWidth:300,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{t.description || '—'}</td>
-                    <td><div style={{display:'flex',gap:'0.4rem'}}><button className="btn btn--ghost btn--sm" onClick={() => openEdit(t)}>Edit</button><button className="btn btn--danger btn--sm" onClick={() => remove(t._id)}>Delete</button></div></td>
+                    <td><div style={{display:'flex',gap:'0.4rem'}}><button className="btn btn--ghost btn--sm" onClick={() => openEdit(t)}>Edit</button><button className="btn btn--danger btn--sm" onClick={() => setConfirmTarget(t._id)}>Delete</button></div></td>
                   </tr>
                 ))}
               </tbody>
@@ -81,6 +91,16 @@ export default function Themes() {
           <div className="form-group"><label>Label *</label><input className="form-input" value={form.label} onChange={(e) => set('label', e.target.value)} /></div>
           <div className="form-group"><label>Description</label><textarea className="form-textarea" value={form.description} onChange={(e) => set('description', e.target.value)} /></div>
         </Modal>
+      )}
+      {confirmTarget && (
+        <ConfirmModal
+          title="Delete Theme"
+          message="Are you sure you want to delete this theme? This action cannot be undone."
+          confirmText="Delete"
+          loading={deleting}
+          onConfirm={remove}
+          onCancel={() => setConfirmTarget(null)}
+        />
       )}
       {toast && <Toast key={Date.now()} message={toast.msg} type={toast.type} />}
     </>

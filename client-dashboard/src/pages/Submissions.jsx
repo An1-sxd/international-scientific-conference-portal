@@ -3,6 +3,7 @@ import { FileText } from 'lucide-react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchSubmissions, updateSubmissionStatus, deleteSubmission } from '../api';
 
@@ -17,6 +18,8 @@ export default function Submissions() {
   const [filter, setFilter] = useState('ALL');
   const [expandedId, setExpandedId] = useState(null);
   const [comment, setComment] = useState('');
+  const [confirmTarget, setConfirmTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = () => { if (!selectedId) return; setLoading(true); fetchSubmissions(selectedId).then((r) => setItems(r.data)).catch(() => setItems([])).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, [selectedId]);
@@ -37,13 +40,16 @@ export default function Submissions() {
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this submission? This action cannot be undone.')) return;
+  const handleDelete = async () => {
+    if (!confirmTarget) return;
+    setDeleting(true);
     try {
-      await deleteSubmission(id);
+      await deleteSubmission(confirmTarget);
+      setConfirmTarget(null);
       load();
       setToast({ msg: 'Submission deleted successfully.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
+    finally { setDeleting(false); }
   };
 
   const filtered = items
@@ -90,7 +96,7 @@ export default function Submissions() {
                             {expandedId === s._id ? 'Close' : 'Details'}
                           </button>
                           {s.pdfUrl && <a href={s.pdfUrl} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">PDF</a>}
-                          <button className="btn btn--danger btn--sm" onClick={() => handleDelete(s._id)}>Delete</button>
+                          <button className="btn btn--danger btn--sm" onClick={() => setConfirmTarget(s._id)}>Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -109,7 +115,7 @@ export default function Submissions() {
                             <label style={{fontSize:'var(--fs-xs)',color:'var(--clr-text-muted)',fontWeight:600,textTransform:'uppercase',display:'block',marginBottom:4}}>Authors</label>
                             {s.authors?.map((a, i) => (
                               <div key={i} style={{fontSize:'var(--fs-sm)',color:'var(--clr-text-dim)',marginBottom:2}}>
-                                {a.authorOrder}. {a.fullName} ({a.email}){a.isCorresponding && ' ⭐'} {a.affiliation && `— ${a.affiliation}`}
+                                {a.authorOrder}. {a.fullName} ({a.email}){a.isCorresponding && <span className="badge badge--primary" style={{marginLeft:4,fontSize:'0.65rem'}}>Corresponding</span>} {a.affiliation && `— ${a.affiliation}`}
                               </div>
                             ))}
                           </div>
@@ -128,6 +134,16 @@ export default function Submissions() {
           )}
         </div>
       </div>
+      {confirmTarget && (
+        <ConfirmModal
+          title="Delete Submission"
+          message="Are you sure you want to delete this submission? This will permanently remove the submission and its related data. This action cannot be undone."
+          confirmText="Delete"
+          loading={deleting}
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmTarget(null)}
+        />
+      )}
       {toast && <Toast key={Date.now()} message={toast.msg} type={toast.type} />}
     </>
   );
