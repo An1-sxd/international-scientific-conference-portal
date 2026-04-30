@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
-import { GraduationCap } from "lucide-react";
+import { useTheme } from "./theme";
 import "./Footer.css";
 
 export default function Footer() {
+  const { logoSrc } = useTheme();
+
   return (
     <footer className="footer" id="site-footer">
       <div className="container">
         <div className="footer__top">
           <div className="footer__brand">
-            <span className="footer__logo"><GraduationCap size={28} strokeWidth={2} /></span>
+            <img className="footer__logo" src={logoSrc} alt="" aria-hidden="true" />
             <div>
               <h3 className="footer__title">Blida1 Portal</h3>
               <p className="footer__tagline">

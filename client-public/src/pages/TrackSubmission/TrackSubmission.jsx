@@ -10,7 +10,6 @@ const STATUS_STYLE = {
   REJECTED: "badge--danger",
   PUBLISHED: "badge--accent",
 };
-swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 export default function TrackSubmission() {
   const [mode, setMode] = useState("id"); // "id" or "email"
   const [submissionId, setSubmissionId] = useState("");

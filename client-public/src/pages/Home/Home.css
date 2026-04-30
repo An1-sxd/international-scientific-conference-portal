@@ -123,7 +123,7 @@
 
 /* ── Section Alt (subtle bg shift) ── */
 .section--alt {
-  background: rgba(255,255,255,.015);
+  background: var(--clr-section-alt);
 }
 
 /* ── Speaker Card (extra styles) ── */
@@ -148,7 +148,7 @@
   background: var(--clr-surface-2);
   margin-bottom: var(--sp-sm);
   flex-shrink: 0;
-  box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  box-shadow: var(--shadow-speaker-card);
 }
 .speaker-card__img {
   width: 100%;

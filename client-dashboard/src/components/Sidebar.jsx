@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
+import { useTheme } from './theme';
 import {
   LayoutDashboard, Building2, Mic2, CalendarDays, Tag,
   ClipboardList, Users, FileText, BookOpen, Award, LogOut,
@@ -28,6 +29,7 @@ const links = [
 
 export default function Sidebar() {
   const { admin, logout } = useAuth();
+  const { logoSrc } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -43,7 +45,7 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
-        <div className="sidebar__brand-icon">B1</div>
+        <img className="sidebar__brand-logo" src={logoSrc} alt="" aria-hidden="true" />
         <div>
           <span className="sidebar__brand-text">Blida1 Portal</span>
           <span className="sidebar__brand-sub">Admin Dashboard</span>

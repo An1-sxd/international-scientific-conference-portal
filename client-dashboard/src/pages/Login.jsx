@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider';
+import ThemeToggle from '../components/ThemeToggle';
+import { useTheme } from '../components/theme';
 import { AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import useFormValidation from '../hooks/useFormValidation';
 
 export default function Login() {
   const { login } = useAuth();
+  const { logoSrc } = useTheme();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,6 +34,8 @@ export default function Login() {
 
   return (
     <div className="login-page">
+      <ThemeToggle className="login-theme-toggle" />
+
       {/* Background decoration */}
       <div className="login-bg">
         <div className="login-bg__orb login-bg__orb--1" />
@@ -41,7 +46,7 @@ export default function Login() {
       <div className="login-card fade-in">
         {/* Brand header */}
         <div className="login-card__header">
-          <div className="login-card__brand-icon">B1</div>
+          <img className="login-card__brand-logo" src={logoSrc} alt="" aria-hidden="true" />
           <h1 className="login-card__title">Blida1 Portal</h1>
           <p className="login-card__subtitle">Admin Dashboard</p>
         </div>

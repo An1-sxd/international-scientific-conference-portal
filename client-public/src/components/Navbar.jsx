@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { GraduationCap, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
+import { useTheme } from "./theme";
 import "./Navbar.css";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { logoSrc } = useTheme();
 
   const closeMenu = () => setOpen(false);
 
@@ -12,7 +15,7 @@ export default function Navbar() {
     <nav className="navbar" id="main-navbar">
       <div className="container navbar__inner">
         <Link to="/" className="navbar__brand" id="navbar-brand" onClick={closeMenu}>
-          <span className="navbar__logo-icon"><GraduationCap size={24} strokeWidth={2} /></span>
+          <img className="navbar__logo-img" src={logoSrc} alt="" aria-hidden="true" />
           <span className="navbar__logo-text">
             Blida<span className="text-gradient">1</span> Portal
           </span>
@@ -36,6 +39,7 @@ export default function Navbar() {
           <NavLink to="/track-submission" className="navbar__link" onClick={closeMenu}>Track Submission</NavLink>
           <NavLink to="/track-registration" className="navbar__link" onClick={closeMenu}>Track Registration</NavLink>
           <NavLink to="/verify-certificate" className="navbar__link" onClick={closeMenu}>Certificate</NavLink>
+          <ThemeToggle className="navbar__theme-toggle" />
         </div>
       </div>
     </nav>
