@@ -131,3 +131,13 @@
   color: var(--clr-text-muted);
   font-style: italic;
 }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .submit-form__card { padding: var(--sp-lg); }
+  .submit-form__card-header { flex-direction: column; gap: var(--sp-sm); align-items: flex-start; }
+  .author-block { padding: var(--sp-md); }
+  .author-block__header { flex-wrap: wrap; }
+  .submit-success__title { font-size: var(--fs-2xl); }
+  .submit-success__id { font-size: var(--fs-lg); }
+}

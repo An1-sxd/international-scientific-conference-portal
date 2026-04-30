@@ -13,6 +13,7 @@
   align-items: center;
   justify-content: space-between;
   height: 64px;
+  flex-wrap: wrap;
 }
 
 .navbar__brand {
@@ -29,6 +30,26 @@
 .navbar__logo-icon { font-size: 1.5rem; }
 .navbar__logo-text { letter-spacing: -0.02em; }
 
+/* ── Toggle Button (hidden on desktop) ── */
+.navbar__toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--clr-border-2);
+  border-radius: var(--r-md);
+  background: var(--clr-surface-2);
+  color: var(--clr-text);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.navbar__toggle:hover {
+  background: var(--clr-surface-3);
+  border-color: var(--clr-primary);
+}
+
+/* ── Links ── */
 .navbar__links {
   display: flex;
   align-items: center;
@@ -52,6 +73,7 @@
   background: rgba(99,102,241,.1);
 }
 
+/* ── Tablet (shrink link padding) ── */
 @media (max-width: 900px) {
   .navbar__links {
     gap: 0;
@@ -60,4 +82,59 @@
     padding: 0.4rem 0.55rem;
     font-size: var(--fs-xs);
   }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .navbar__inner {
+    position: relative;
+  }
+
+  .navbar__toggle {
+    display: flex;
+  }
+
+  .navbar__links {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: rgba(11,15,26,.97);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border-bottom: 1px solid var(--clr-border);
+    border-top: 1px solid var(--clr-border);
+    padding: var(--sp-sm) 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  }
+
+  .navbar__links--open {
+    display: flex;
+    animation: navSlideDown .25s var(--ease) both;
+  }
+
+  .navbar__link {
+    padding: 0.75rem 1.25rem;
+    font-size: var(--fs-sm);
+    border-radius: 0;
+    border-left: 3px solid transparent;
+    transition: all var(--dur) var(--ease);
+  }
+  .navbar__link:hover {
+    background: rgba(255,255,255,.04);
+    border-left-color: var(--clr-primary);
+  }
+  .navbar__link.active {
+    background: rgba(99,102,241,.08);
+    border-left-color: var(--clr-primary-h);
+  }
+}
+
+@keyframes navSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
