@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './components/AuthProvider';
 import Sidebar from './components/Sidebar';
 import { ConferenceProvider } from './components/ConferenceProvider';
 import Dashboard from './pages/Dashboard';
@@ -11,8 +12,27 @@ import Participants from './pages/Participants';
 import Submissions from './pages/Submissions';
 import Researches from './pages/Researches';
 import Certificates from './pages/Certificates';
+import Login from './pages/Login';
 
-export default function App() {
+function ProtectedRoute({ children }) {
+  const { admin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="login-page" style={{ justifyContent: 'center' }}>
+        <div className="loader" />
+      </div>
+    );
+  }
+
+  if (!admin) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+function DashboardLayout() {
   return (
     <ConferenceProvider>
       <div className="dashboard">
@@ -33,5 +53,23 @@ export default function App() {
         </div>
       </div>
     </ConferenceProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
   );
 }

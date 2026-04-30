@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthProvider';
 
 const links = [
   { label: 'OVERVIEW', items: [
@@ -22,6 +23,19 @@ const links = [
 ];
 
 export default function Sidebar() {
+  const { admin, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login', { replace: true });
+    } catch {
+      // Force redirect even if API call fails
+      navigate('/login', { replace: true });
+    }
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
@@ -51,6 +65,21 @@ export default function Sidebar() {
           </div>
         ))}
       </nav>
+      {/* Admin info + logout */}
+      <div className="sidebar__footer">
+        <div className="sidebar__admin-info">
+          <div className="sidebar__admin-avatar">
+            {admin?.fullName?.charAt(0)?.toUpperCase() || 'A'}
+          </div>
+          <div className="sidebar__admin-details">
+            <span className="sidebar__admin-name">{admin?.fullName || 'Admin'}</span>
+            <span className="sidebar__admin-email">{admin?.email || ''}</span>
+          </div>
+        </div>
+        <button className="sidebar__logout" onClick={handleLogout} title="Logout">
+          🚪
+        </button>
+      </div>
     </aside>
   );
 }

@@ -2,7 +2,7 @@ const API_BASE = "http://localhost:3000/api/admin";
 
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
-  const config = { ...options };
+  const config = { ...options, credentials: "include" };
 
   // Don't set Content-Type for FormData (browser handles multipart boundary)
   if (!(options.body instanceof FormData)) {
@@ -11,11 +11,26 @@ async function request(endpoint, options = {}) {
 
   const res = await fetch(url, config);
   const data = await res.json();
+
+  // If 401, redirect to login (unless already on an auth endpoint)
+  if (res.status === 401 && !endpoint.startsWith("/auth/")) {
+    window.location.href = "/login";
+    throw new Error("Session expired. Redirecting to login...");
+  }
+
   if (!data.success) {
     throw new Error(data.message || "Something went wrong");
   }
   return data;
 }
+
+// ─── Auth ───
+export const loginAdmin = (email, password) =>
+  request("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
+export const logoutAdmin = () =>
+  request("/auth/logout", { method: "POST" });
+export const fetchCurrentAdmin = () =>
+  request("/auth/me");
 
 // ─── Dashboard ───
 export const fetchDashboardStats = (conferenceId) =>

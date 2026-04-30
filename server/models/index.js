@@ -1,3 +1,4 @@
+import "./admin.model.js";
 import "./certificate.model.js";
 // import "./committeeUser.model.js"
 import "./conference.model.js";
