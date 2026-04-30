@@ -128,19 +128,20 @@ export async function sendRegistrationStatusEmail(registration) {
 // 2. Submission Status Update
 // ───────────────────────────────────────────────────────────
 export async function sendSubmissionStatusEmail(submission) {
-  // Send to the corresponding author
-  const correspondingAuthor = submission.authors?.find((a) => a.isCorresponding);
-  const recipientEmail = correspondingAuthor?.email;
-  const recipientName = correspondingAuthor?.fullName || "Author";
+  // Collect all unique author emails
+  const allEmails = [...new Set((submission.authors || []).map((a) => a.email).filter(Boolean))];
 
-  if (!recipientEmail) return;
+  if (allEmails.length === 0) return;
+
+  const correspondingAuthor = submission.authors?.find((a) => a.isCorresponding);
+  const greetingName = correspondingAuthor?.fullName || "Authors";
 
   const theme = submission.themeId;
 
   const body = `
     <h2 style="margin:0 0 8px;color:#1a237e;font-size:20px;">Submission Status Update</h2>
     <p style="margin:0 0 20px;color:#555;font-size:15px;line-height:1.6;">
-      Dear <strong>${recipientName}</strong>, your submission status has been updated.
+      Dear <strong>${greetingName}</strong> and co-authors, your submission status has been updated.
     </p>
 
     <p style="margin:0 0 16px;font-size:15px;color:#333;">
@@ -180,7 +181,7 @@ export async function sendSubmissionStatusEmail(submission) {
 
   await transporter.sendMail({
     from: `"Conference Portal" <${process.env.EMAIL_USER}>`,
-    to: recipientEmail,
+    to: allEmails.join(", "),
     subject: `Submission ${submission.status} – ${submission.paperTitle}`,
     html: htmlWrapper("Submission Status Update", body),
   });
