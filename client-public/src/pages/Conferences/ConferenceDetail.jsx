@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { fetchConferenceById, registerForConference } from "../../api";
 import SpeakerCard from "../../components/SpeakerCard";
 import { CalendarDays, MapPin, Mail, DoorOpen, X, CheckCircle2 } from "lucide-react";
+import useFormValidation from "../../hooks/useFormValidation";
 import "./ConferenceDetail.css";
 
 function fmt(dateStr) {
@@ -33,6 +34,8 @@ export default function ConferenceDetail() {
   const [regResult, setRegResult] = useState(null);
   const [regError, setRegError] = useState(null);
 
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
+
   useEffect(() => {
     fetchConferenceById(id)
       .then((res) => setData(res.data))
@@ -40,8 +43,23 @@ export default function ConferenceDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const openRegModal = () => {
+    setRegForm({ fullName: "", email: "", phone: "", affiliation: "", country: "", participantType: "RESEARCHER" });
+    setRegResult(null);
+    setRegError(null);
+    resetValidation();
+    setShowRegModal(true);
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
+    const rules = {
+      fullName: { required: true },
+      email: { required: true, email: true },
+      phone: { phone: true },
+    };
+    if (!validate(regForm, rules)) return;
+
     setRegLoading(true);
     setRegError(null);
     try {
@@ -102,7 +120,7 @@ export default function ConferenceDetail() {
             <button
               className="btn btn--primary btn--lg"
               id="register-conference-btn"
-              onClick={() => setShowRegModal(true)}
+              onClick={openRegModal}
             >
               Register for this Conference
             </button>
@@ -219,28 +237,34 @@ export default function ConferenceDetail() {
 
                 {regError && <div className="modal__error">{regError}</div>}
 
-                <form onSubmit={handleRegister}>
-                  <div className="form-group">
+                <form onSubmit={handleRegister} noValidate>
+                  <div className={groupClass('fullName')}>
                     <label htmlFor="reg-fullName">Full Name *</label>
-                    <input id="reg-fullName" className="form-input" required
+                    <input id="reg-fullName" className="form-input"
                       value={regForm.fullName}
                       onChange={(e) => setRegForm({ ...regForm, fullName: e.target.value })}
+                      onBlur={() => touchField('fullName', regForm.fullName, { required: true })}
                     />
+                    {touched.fullName && errors.fullName && <span className="form-error">{errors.fullName}</span>}
                   </div>
-                  <div className="form-group">
+                  <div className={groupClass('email')}>
                     <label htmlFor="reg-email">Email *</label>
-                    <input id="reg-email" className="form-input" type="email" required
+                    <input id="reg-email" className="form-input" type="email"
                       value={regForm.email}
                       onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
+                      onBlur={() => touchField('email', regForm.email, { required: true, email: true })}
                     />
+                    {touched.email && errors.email && <span className="form-error">{errors.email}</span>}
                   </div>
                   <div className="grid-2">
-                    <div className="form-group">
+                    <div className={groupClass('phone')}>
                       <label htmlFor="reg-phone">Phone</label>
                       <input id="reg-phone" className="form-input"
                         value={regForm.phone}
                         onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
+                        onBlur={() => touchField('phone', regForm.phone, { phone: true })}
                       />
+                      {touched.phone && errors.phone && <span className="form-error">{errors.phone}</span>}
                     </div>
                     <div className="form-group">
                       <label htmlFor="reg-country">Country</label>

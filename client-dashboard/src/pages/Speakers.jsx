@@ -8,6 +8,7 @@ import FileInput from '../components/FileInput';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchSpeakers, createSpeaker, updateSpeaker, deleteSpeaker } from '../api';
 import { Mic2 } from 'lucide-react';
+import useFormValidation from '../hooks/useFormValidation';
 
 const empty = { fullName: '', academicTitle: '', affiliation: '', country: '', topic: '', biography: '', email: '' };
 
@@ -23,16 +24,18 @@ export default function Speakers() {
   const [search, setSearch] = useState('');
   const [confirmTarget, setConfirmTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
 
   const load = () => { if (!selectedId) return; setLoading(true); fetchSpeakers(selectedId).then((r) => setItems(r.data)).catch(() => setItems([])).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, [selectedId]);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
-  const openAdd = () => { setForm(empty); setPhoto(null); setEditId(null); setModal('add'); };
-  const openEdit = (s) => { setForm({ fullName: s.fullName, academicTitle: s.academicTitle || '', affiliation: s.affiliation || '', country: s.country || '', topic: s.topic || '', biography: s.biography || '', email: s.email || '' }); setPhoto(null); setEditId(s._id); setModal('edit'); };
+  const openAdd = () => { setForm(empty); setPhoto(null); setEditId(null); resetValidation(); setModal('add'); };
+  const openEdit = (s) => { setForm({ fullName: s.fullName, academicTitle: s.academicTitle || '', affiliation: s.affiliation || '', country: s.country || '', topic: s.topic || '', biography: s.biography || '', email: s.email || '' }); setPhoto(null); setEditId(s._id); resetValidation(); setModal('edit'); };
 
   const save = async () => {
+    if (!validate(form, { fullName: { required: true } })) return;
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => { if (v) fd.append(k, v); });
@@ -96,7 +99,7 @@ export default function Speakers() {
         <Modal title={modal === 'add' ? 'Add Speaker' : 'Edit Speaker'} onClose={() => setModal(null)}
           footer={<><button className="btn btn--ghost" onClick={() => setModal(null)}>Cancel</button><button className="btn btn--primary" onClick={save}>Save</button></>}>
           <div className="form-row">
-            <div className="form-group"><label>Full Name *</label><input className="form-input" value={form.fullName} onChange={(e) => set('fullName', e.target.value)} /></div>
+            <div className={groupClass('fullName')}><label>Full Name *</label><input className="form-input" value={form.fullName} onChange={(e) => set('fullName', e.target.value)} onBlur={() => touchField('fullName', form.fullName, { required: true })} />{touched.fullName && errors.fullName && <span className="form-error">{errors.fullName}</span>}</div>
             <div className="form-group"><label>Academic Title</label><input className="form-input" value={form.academicTitle} onChange={(e) => set('academicTitle', e.target.value)} /></div>
           </div>
           <div className="form-row">

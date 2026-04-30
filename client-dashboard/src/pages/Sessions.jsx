@@ -7,6 +7,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchSessions, createSession, updateSession, deleteSession, fetchThemes, fetchSpeakers } from '../api';
 import { CalendarDays } from 'lucide-react';
+import useFormValidation from '../hooks/useFormValidation';
 
 const empty = { sessionTitle: '', themeId: '', speakerId: '', startsAt: '', endsAt: '', room: '', description: '' };
 
@@ -23,6 +24,7 @@ export default function Sessions() {
   const [search, setSearch] = useState('');
   const [confirmTarget, setConfirmTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
 
   const load = () => {
     if (!selectedId) return;
@@ -37,13 +39,14 @@ export default function Sessions() {
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
   const fmt = (d) => d ? new Date(d).toISOString().slice(0, 16) : '';
 
-  const openAdd = () => { setForm(empty); setEditId(null); setModal('add'); };
+  const openAdd = () => { setForm(empty); setEditId(null); resetValidation(); setModal('add'); };
   const openEdit = (s) => {
     setForm({ sessionTitle: s.sessionTitle, themeId: s.themeId?._id || s.themeId || '', speakerId: s.speakerId?._id || s.speakerId || '', startsAt: fmt(s.startsAt), endsAt: fmt(s.endsAt), room: s.room || '', description: s.description || '' });
-    setEditId(s._id); setModal('edit');
+    setEditId(s._id); resetValidation(); setModal('edit');
   };
 
   const save = async () => {
+    if (!validate(form, { sessionTitle: { required: true }, startsAt: { required: true }, endsAt: { required: true } })) return;
     try {
       const body = { ...form };
       if (!body.speakerId) delete body.speakerId;
@@ -106,7 +109,7 @@ export default function Sessions() {
       {modal && (
         <Modal title={modal === 'add' ? 'Add Session' : 'Edit Session'} onClose={() => setModal(null)}
           footer={<><button className="btn btn--ghost" onClick={() => setModal(null)}>Cancel</button><button className="btn btn--primary" onClick={save}>Save</button></>}>
-          <div className="form-group"><label>Session Title *</label><input className="form-input" value={form.sessionTitle} onChange={(e) => set('sessionTitle', e.target.value)} /></div>
+          <div className={groupClass('sessionTitle')}><label>Session Title *</label><input className="form-input" value={form.sessionTitle} onChange={(e) => set('sessionTitle', e.target.value)} onBlur={() => touchField('sessionTitle', form.sessionTitle, { required: true })} />{touched.sessionTitle && errors.sessionTitle && <span className="form-error">{errors.sessionTitle}</span>}</div>
           <div className="form-row">
             <div className="form-group"><label>Theme *</label>
               <select className="form-select" value={form.themeId} onChange={(e) => set('themeId', e.target.value)}>
@@ -122,8 +125,8 @@ export default function Sessions() {
             </div>
           </div>
           <div className="form-row">
-            <div className="form-group"><label>Starts At *</label><input className="form-input" type="datetime-local" value={form.startsAt} onChange={(e) => set('startsAt', e.target.value)} /></div>
-            <div className="form-group"><label>Ends At *</label><input className="form-input" type="datetime-local" value={form.endsAt} onChange={(e) => set('endsAt', e.target.value)} /></div>
+            <div className={groupClass('startsAt')}><label>Starts At *</label><input className="form-input" type="datetime-local" value={form.startsAt} onChange={(e) => set('startsAt', e.target.value)} onBlur={() => touchField('startsAt', form.startsAt, { required: true })} />{touched.startsAt && errors.startsAt && <span className="form-error">{errors.startsAt}</span>}</div>
+            <div className={groupClass('endsAt')}><label>Ends At *</label><input className="form-input" type="datetime-local" value={form.endsAt} onChange={(e) => set('endsAt', e.target.value)} onBlur={() => touchField('endsAt', form.endsAt, { required: true })} />{touched.endsAt && errors.endsAt && <span className="form-error">{errors.endsAt}</span>}</div>
           </div>
           <div className="form-group"><label>Room</label><input className="form-input" value={form.room} onChange={(e) => set('room', e.target.value)} /></div>
           <div className="form-group"><label>Description</label><textarea className="form-textarea" value={form.description} onChange={(e) => set('description', e.target.value)} /></div>

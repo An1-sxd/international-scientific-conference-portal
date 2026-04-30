@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider';
 import { AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import useFormValidation from '../hooks/useFormValidation';
 
 export default function Login() {
   const { login } = useAuth();
@@ -11,9 +12,11 @@ export default function Login() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { touched, errors, touchField, validate, groupClass } = useFormValidation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate({ email, password }, { email: { required: true, email: true }, password: { required: true } })) return;
     setError('');
     setSubmitting(true);
     try {
@@ -44,7 +47,7 @@ export default function Login() {
         </div>
 
         {/* Form */}
-        <form className="login-card__form" onSubmit={handleSubmit}>
+        <form className="login-card__form" onSubmit={handleSubmit} noValidate>
           <h2 className="login-card__welcome">Welcome back</h2>
           <p className="login-card__desc">Sign in to your admin account</p>
 
@@ -54,7 +57,7 @@ export default function Login() {
             </div>
           )}
 
-          <div className="form-group">
+          <div className={groupClass('email')}>
             <label htmlFor="login-email">Email</label>
             <input
               id="login-email"
@@ -66,10 +69,12 @@ export default function Login() {
               required
               autoFocus
               autoComplete="email"
+              onBlur={() => touchField('email', email, { required: true, email: true })}
             />
+            {touched.email && errors.email && <span className="form-error">{errors.email}</span>}
           </div>
 
-          <div className="form-group">
+          <div className={groupClass('password')}>
             <label htmlFor="login-password">Password</label>
             <div className="login-card__pw-wrap">
               <input
@@ -81,6 +86,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
+                onBlur={() => touchField('password', password, { required: true })}
               />
               <button
                 type="button"
@@ -91,6 +97,7 @@ export default function Login() {
                 {showPassword ? <EyeOff size={18} strokeWidth={2} /> : <Eye size={18} strokeWidth={2} />}
               </button>
             </div>
+            {touched.password && errors.password && <span className="form-error">{errors.password}</span>}
           </div>
 
           <button

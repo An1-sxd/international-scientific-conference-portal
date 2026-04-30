@@ -6,6 +6,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchConferences as apiFetch, createConference, updateConference, deleteConference } from '../api';
 import { Building2 } from 'lucide-react';
+import useFormValidation from '../hooks/useFormValidation';
 
 const empty = { name: '', slogan: '', description: '', startDate: '', endDate: '', venue: '', city: '', country: '', contactEmail: '', isActive: true };
 
@@ -20,20 +21,23 @@ export default function Conferences() {
   const [search, setSearch] = useState('');
   const [confirmTarget, setConfirmTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
 
   const load = () => apiFetch().then((r) => setItems(r.data)).finally(() => setLoading(false));
   useEffect(() => { load(); }, []);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
-  const openAdd = () => { setForm(empty); setEditId(null); setModal('add'); };
+  const openAdd = () => { setForm(empty); setEditId(null); resetValidation(); setModal('add'); };
   const openEdit = (c) => {
     setForm({ ...c, startDate: c.startDate?.slice(0, 10), endDate: c.endDate?.slice(0, 10) });
     setEditId(c._id);
+    resetValidation();
     setModal('edit');
   };
 
   const save = async () => {
+    if (!validate(form, { name: { required: true }, startDate: { required: true }, endDate: { required: true } })) return;
     try {
       if (modal === 'add') await createConference(form);
       else await updateConference(editId, form);
@@ -102,12 +106,12 @@ export default function Conferences() {
       {modal && (
         <Modal title={modal === 'add' ? 'New Conference' : 'Edit Conference'} onClose={() => setModal(null)}
           footer={<><button className="btn btn--ghost" onClick={() => setModal(null)}>Cancel</button><button className="btn btn--primary" onClick={save}>Save</button></>}>
-          <div className="form-group"><label>Name *</label><input className="form-input" value={form.name} onChange={(e) => set('name', e.target.value)} /></div>
+          <div className={groupClass('name')}><label>Name *</label><input className="form-input" value={form.name} onChange={(e) => set('name', e.target.value)} onBlur={() => touchField('name', form.name, { required: true })} />{touched.name && errors.name && <span className="form-error">{errors.name}</span>}</div>
           <div className="form-group"><label>Slogan</label><input className="form-input" value={form.slogan} onChange={(e) => set('slogan', e.target.value)} /></div>
           <div className="form-group"><label>Description</label><textarea className="form-textarea" value={form.description} onChange={(e) => set('description', e.target.value)} /></div>
           <div className="form-row">
-            <div className="form-group"><label>Start Date *</label><input className="form-input" type="date" value={form.startDate} onChange={(e) => set('startDate', e.target.value)} /></div>
-            <div className="form-group"><label>End Date *</label><input className="form-input" type="date" value={form.endDate} onChange={(e) => set('endDate', e.target.value)} /></div>
+            <div className={groupClass('startDate')}><label>Start Date *</label><input className="form-input" type="date" value={form.startDate} onChange={(e) => set('startDate', e.target.value)} onBlur={() => touchField('startDate', form.startDate, { required: true })} />{touched.startDate && errors.startDate && <span className="form-error">{errors.startDate}</span>}</div>
+            <div className={groupClass('endDate')}><label>End Date *</label><input className="form-input" type="date" value={form.endDate} onChange={(e) => set('endDate', e.target.value)} onBlur={() => touchField('endDate', form.endDate, { required: true })} />{touched.endDate && errors.endDate && <span className="form-error">{errors.endDate}</span>}</div>
           </div>
           <div className="form-row">
             <div className="form-group"><label>Venue</label><input className="form-input" value={form.venue} onChange={(e) => set('venue', e.target.value)} /></div>

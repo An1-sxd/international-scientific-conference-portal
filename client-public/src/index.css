@@ -279,6 +279,21 @@ code   { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.9em
 }
 .form-textarea { resize: vertical; min-height: 120px; }
 
+/* ── Inline Validation ───────────────────────────────────── */
+.form-group--error .form-input,
+.form-group--error .form-textarea,
+.form-group--error .form-select {
+  border-color: var(--clr-danger) !important;
+  box-shadow: 0 0 0 3px rgba(239,68,68,.12) !important;
+}
+.form-error {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--clr-danger);
+  margin-top: 0.3rem;
+  line-height: 1.3;
+}
+
 /* ── Filter Bar ──────────────────────────────────────────── */
 .filter-bar {
   display: flex;

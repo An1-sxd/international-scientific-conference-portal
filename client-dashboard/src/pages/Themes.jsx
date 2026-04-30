@@ -7,6 +7,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchThemes, createTheme, updateTheme, deleteTheme } from '../api';
 import { Tag } from 'lucide-react';
+import useFormValidation from '../hooks/useFormValidation';
 
 const empty = { code: '', label: '', description: '', displayOrder: 0 };
 
@@ -20,15 +21,17 @@ export default function Themes() {
   const [toast, setToast] = useState(null);
   const [confirmTarget, setConfirmTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
 
   const load = () => { if (!selectedId) return; setLoading(true); fetchThemes(selectedId).then((r) => setItems(r.data)).catch(() => setItems([])).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, [selectedId]);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
-  const openAdd = () => { setForm(empty); setEditId(null); setModal('add'); };
-  const openEdit = (t) => { setForm({ code: t.code, label: t.label, description: t.description || '', displayOrder: t.displayOrder }); setEditId(t._id); setModal('edit'); };
+  const openAdd = () => { setForm(empty); setEditId(null); resetValidation(); setModal('add'); };
+  const openEdit = (t) => { setForm({ code: t.code, label: t.label, description: t.description || '', displayOrder: t.displayOrder }); setEditId(t._id); resetValidation(); setModal('edit'); };
 
   const save = async () => {
+    if (!validate(form, { code: { required: true }, label: { required: true } })) return;
     try {
       if (modal === 'add') await createTheme(selectedId, form);
       else await updateTheme(editId, form);
@@ -85,10 +88,10 @@ export default function Themes() {
         <Modal title={modal === 'add' ? 'Add Theme' : 'Edit Theme'} onClose={() => setModal(null)}
           footer={<><button className="btn btn--ghost" onClick={() => setModal(null)}>Cancel</button><button className="btn btn--primary" onClick={save}>Save</button></>}>
           <div className="form-row">
-            <div className="form-group"><label>Code *</label><input className="form-input" value={form.code} onChange={(e) => set('code', e.target.value)} placeholder="e.g. AI" /></div>
+            <div className={groupClass('code')}><label>Code *</label><input className="form-input" value={form.code} onChange={(e) => set('code', e.target.value)} onBlur={() => touchField('code', form.code, { required: true })} placeholder="e.g. AI" />{touched.code && errors.code && <span className="form-error">{errors.code}</span>}</div>
             <div className="form-group"><label>Display Order</label><input className="form-input" type="number" value={form.displayOrder} onChange={(e) => set('displayOrder', Number(e.target.value))} /></div>
           </div>
-          <div className="form-group"><label>Label *</label><input className="form-input" value={form.label} onChange={(e) => set('label', e.target.value)} /></div>
+          <div className={groupClass('label')}><label>Label *</label><input className="form-input" value={form.label} onChange={(e) => set('label', e.target.value)} onBlur={() => touchField('label', form.label, { required: true })} />{touched.label && errors.label && <span className="form-error">{errors.label}</span>}</div>
           <div className="form-group"><label>Description</label><textarea className="form-textarea" value={form.description} onChange={(e) => set('description', e.target.value)} /></div>
         </Modal>
       )}
