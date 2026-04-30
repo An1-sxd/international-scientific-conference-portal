@@ -3,6 +3,7 @@ import express from "express";
 import Registration from "../../models/registration.model.js";
 import { REGISTRATION_STATUSES } from "../../constants/enums.js";
 import { handleModelError, resolveConference, sendError, isValidObjectId } from "../public/helpers.js";
+import { sendRegistrationStatusEmail, sendCertificateReadyEmail } from "../../services/email.service.js";
 
 const router = express.Router();
 
@@ -46,6 +47,18 @@ router.patch("/registrations/:id/status", async (req, res) => {
       .populate("conferenceId");
 
     if (!registration) return sendError(res, 404, "Registration not found.");
+
+    // Send email notifications (fire-and-forget)
+    try {
+      if (registrationStatus) {
+        await sendRegistrationStatusEmail(registration);
+      }
+      if (attendanceConfirmed === true) {
+        await sendCertificateReadyEmail(registration);
+      }
+    } catch (emailError) {
+      console.error("Failed to send email notification:", emailError.message);
+    }
 
     return res.json({ success: true, data: registration });
   } catch (error) {

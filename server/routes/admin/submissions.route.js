@@ -3,6 +3,7 @@ import express from "express";
 import Submission from "../../models/submission.model.js";
 import { SUBMISSION_STATUSES } from "../../constants/enums.js";
 import { handleModelError, resolveConference, sendError, isValidObjectId } from "../public/helpers.js";
+import { sendSubmissionStatusEmail } from "../../services/email.service.js";
 
 const router = express.Router();
 
@@ -42,6 +43,15 @@ router.patch("/submissions/:id/status", async (req, res) => {
     }).populate("themeId");
 
     if (!submission) return sendError(res, 404, "Submission not found.");
+
+    // Send email notification (fire-and-forget)
+    try {
+      if (status) {
+        await sendSubmissionStatusEmail(submission);
+      }
+    } catch (emailError) {
+      console.error("Failed to send email notification:", emailError.message);
+    }
 
     return res.json({ success: true, data: submission });
   } catch (error) {
