@@ -7,6 +7,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchParticipants, updateParticipant, deleteParticipant, updateRegistrationStatus } from '../api';
 import { Users } from 'lucide-react';
+import useFormValidation from '../hooks/useFormValidation';
 
 const TYPES = ['STUDENT', 'RESEARCHER', 'PROFESSOR', 'GUEST', 'INDUSTRY'];
 
@@ -22,6 +23,7 @@ export default function Participants() {
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [confirmTarget, setConfirmTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
 
   const load = () => {
     if (!selectedId) return;
@@ -37,10 +39,11 @@ export default function Participants() {
 
   const openEdit = (p) => {
     setForm({ fullName: p.fullName, email: p.email, phone: p.phone || '', affiliation: p.affiliation || '', country: p.country || '', participantType: p.participantType });
-    setEditId(p._id); setModal(true);
+    setEditId(p._id); resetValidation(); setModal(true);
   };
 
   const save = async () => {
+    if (!validate(form, { fullName: { required: true }, email: { required: true, email: true }, phone: { phone: true } })) return;
     try {
       await updateParticipant(editId, form);
       setModal(false); load();
@@ -154,11 +157,11 @@ export default function Participants() {
         <Modal title="Edit Participant" onClose={() => setModal(false)}
           footer={<><button className="btn btn--ghost" onClick={() => setModal(false)}>Cancel</button><button className="btn btn--primary" onClick={save}>Save</button></>}>
           <div className="form-row">
-            <div className="form-group"><label>Full Name</label><input className="form-input" value={form.fullName} onChange={(e) => set('fullName', e.target.value)} /></div>
-            <div className="form-group"><label>Email</label><input className="form-input" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} /></div>
+            <div className={groupClass('fullName')}><label>Full Name *</label><input className="form-input" value={form.fullName} onChange={(e) => set('fullName', e.target.value)} onBlur={() => touchField('fullName', form.fullName, { required: true })} />{touched.fullName && errors.fullName && <span className="form-error">{errors.fullName}</span>}</div>
+            <div className={groupClass('email')}><label>Email *</label><input className="form-input" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} onBlur={() => touchField('email', form.email, { required: true, email: true })} />{touched.email && errors.email && <span className="form-error">{errors.email}</span>}</div>
           </div>
           <div className="form-row">
-            <div className="form-group"><label>Phone</label><input className="form-input" value={form.phone} onChange={(e) => set('phone', e.target.value)} /></div>
+            <div className={groupClass('phone')}><label>Phone</label><input className="form-input" value={form.phone} onChange={(e) => set('phone', e.target.value)} onBlur={() => touchField('phone', form.phone, { phone: true })} />{touched.phone && errors.phone && <span className="form-error">{errors.phone}</span>}</div>
             <div className="form-group"><label>Country</label><input className="form-input" value={form.country} onChange={(e) => set('country', e.target.value)} /></div>
           </div>
           <div className="form-row">

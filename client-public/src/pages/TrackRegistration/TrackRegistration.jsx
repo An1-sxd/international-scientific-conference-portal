@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trackRegistration } from "../../api";
+import useFormValidation from "../../hooks/useFormValidation";
 import "./TrackRegistration.css";
 
 const STATUS_STYLE = {
@@ -15,9 +16,18 @@ export default function TrackRegistration() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
+
+  const switchMode = (m) => { setMode(m); setResults(null); setError(null); resetValidation(); };
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    const rules = mode === "id"
+      ? { registrationId: { required: true } }
+      : { email: { required: true, email: true } };
+    const vals = mode === "id" ? { registrationId } : { email };
+    if (!validate(vals, rules)) return;
+
     setLoading(true);
     setError(null);
     setResults(null);
@@ -44,43 +54,45 @@ export default function TrackRegistration() {
           <div className="track-card__tabs">
             <button
               className={`track-card__tab ${mode === "id" ? "track-card__tab--active" : ""}`}
-              onClick={() => { setMode("id"); setResults(null); setError(null); }}
+              onClick={() => switchMode("id")}
             >
               By Registration ID
             </button>
             <button
               className={`track-card__tab ${mode === "email" ? "track-card__tab--active" : ""}`}
-              onClick={() => { setMode("email"); setResults(null); setError(null); }}
+              onClick={() => switchMode("email")}
             >
               By Email
             </button>
           </div>
 
-          <form onSubmit={handleSearch} className="track-card__form">
+          <form onSubmit={handleSearch} className="track-card__form" noValidate>
             {mode === "id" ? (
-              <div className="form-group">
+              <div className={groupClass('registrationId')}>
                 <label htmlFor="reg-id">Registration ID</label>
                 <input
                   id="reg-id"
                   className="form-input"
                   placeholder="e.g. REG-2026-0001"
-                  required
                   value={registrationId}
                   onChange={(e) => setRegistrationId(e.target.value)}
+                  onBlur={() => touchField('registrationId', registrationId, { required: true })}
                 />
+                {touched.registrationId && errors.registrationId && <span className="form-error">{errors.registrationId}</span>}
               </div>
             ) : (
-              <div className="form-group">
+              <div className={groupClass('email')}>
                 <label htmlFor="reg-email">Email Address</label>
                 <input
                   id="reg-email"
                   className="form-input"
                   type="email"
                   placeholder="your.email@example.com"
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => touchField('email', email, { required: true, email: true })}
                 />
+                {touched.email && errors.email && <span className="form-error">{errors.email}</span>}
               </div>
             )}
 

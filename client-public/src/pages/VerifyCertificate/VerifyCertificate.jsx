@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { checkCertificateStatus } from "../../api";
 import { XCircle, Clock, CheckCircle2, Eye, Download } from "lucide-react";
+import useFormValidation from "../../hooks/useFormValidation";
 import "./VerifyCertificate.css";
 
 export default function VerifyCertificate() {
@@ -10,9 +11,23 @@ export default function VerifyCertificate() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
+
+  const resetForm = (newMode) => {
+    setMode(newMode);
+    setResults(null);
+    setError(null);
+    resetValidation();
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    const rules = mode === "id"
+      ? { registrationId: { required: true } }
+      : { email: { required: true, email: true } };
+    const vals = mode === "id" ? { registrationId } : { email };
+    if (!validate(vals, rules)) return;
+
     setLoading(true);
     setError(null);
     setResults(null);
@@ -25,12 +40,6 @@ export default function VerifyCertificate() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const resetForm = (newMode) => {
-    setMode(newMode);
-    setResults(null);
-    setError(null);
   };
 
   return (
@@ -57,31 +66,33 @@ export default function VerifyCertificate() {
             </button>
           </div>
 
-          <form onSubmit={handleSearch} className="track-card__form">
+          <form onSubmit={handleSearch} className="track-card__form" noValidate>
             {mode === "id" ? (
-              <div className="form-group">
+              <div className={groupClass('registrationId')}>
                 <label htmlFor="cert-reg-id">Registration ID</label>
                 <input
                   id="cert-reg-id"
                   className="form-input"
                   placeholder="e.g. REG-2026-0001"
-                  required
                   value={registrationId}
                   onChange={(e) => setRegistrationId(e.target.value)}
+                  onBlur={() => touchField('registrationId', registrationId, { required: true })}
                 />
+                {touched.registrationId && errors.registrationId && <span className="form-error">{errors.registrationId}</span>}
               </div>
             ) : (
-              <div className="form-group">
+              <div className={groupClass('email')}>
                 <label htmlFor="cert-email">Email Address</label>
                 <input
                   id="cert-email"
                   className="form-input"
                   type="email"
                   placeholder="e.g. your.email@example.com"
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => touchField('email', email, { required: true, email: true })}
                 />
+                {touched.email && errors.email && <span className="form-error">{errors.email}</span>}
               </div>
             )}
 

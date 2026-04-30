@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { checkSubmissionStatus } from "../../api";
+import useFormValidation from "../../hooks/useFormValidation";
 import "./TrackSubmission.css";
 
 const STATUS_STYLE = {
@@ -9,7 +10,7 @@ const STATUS_STYLE = {
   REJECTED: "badge--danger",
   PUBLISHED: "badge--accent",
 };
-
+swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 export default function TrackSubmission() {
   const [mode, setMode] = useState("id"); // "id" or "email"
   const [submissionId, setSubmissionId] = useState("");
@@ -18,9 +19,18 @@ export default function TrackSubmission() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
+
+  const switchMode = (m) => { setMode(m); resetValidation(); };
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    const rules = mode === "id"
+      ? { submissionId: { required: true } }
+      : { email: { required: true, email: true }, paperTitle: { required: true } };
+    const vals = mode === "id" ? { submissionId } : { email, paperTitle };
+    if (!validate(vals, rules)) return;
+
     setLoading(true);
     setError(null);
     setResult(null);
@@ -50,53 +60,56 @@ export default function TrackSubmission() {
           <div className="track-card__tabs">
             <button
               className={`track-card__tab ${mode === "id" ? "track-card__tab--active" : ""}`}
-              onClick={() => setMode("id")}
+              onClick={() => switchMode("id")}
             >
               By Submission ID
             </button>
             <button
               className={`track-card__tab ${mode === "email" ? "track-card__tab--active" : ""}`}
-              onClick={() => setMode("email")}
+              onClick={() => switchMode("email")}
             >
-              By Email & Title
+              By Email &amp; Title
             </button>
           </div>
 
-          <form onSubmit={handleSearch} className="track-card__form">
+          <form onSubmit={handleSearch} className="track-card__form" noValidate>
             {mode === "id" ? (
-              <div className="form-group">
+              <div className={groupClass('submissionId')}>
                 <label htmlFor="track-id">Submission ID</label>
                 <input
                   id="track-id"
                   className="form-input"
                   placeholder="e.g. SUB-2026-0001"
-                  required
                   value={submissionId}
                   onChange={(e) => setSubmissionId(e.target.value)}
+                  onBlur={() => touchField('submissionId', submissionId, { required: true })}
                 />
+                {touched.submissionId && errors.submissionId && <span className="form-error">{errors.submissionId}</span>}
               </div>
             ) : (
               <>
-                <div className="form-group">
+                <div className={groupClass('email')}>
                   <label htmlFor="track-email">Author Email</label>
                   <input
                     id="track-email"
                     className="form-input"
                     type="email"
-                    required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={() => touchField('email', email, { required: true, email: true })}
                   />
+                  {touched.email && errors.email && <span className="form-error">{errors.email}</span>}
                 </div>
-                <div className="form-group">
+                <div className={groupClass('paperTitle')}>
                   <label htmlFor="track-title">Paper Title</label>
                   <input
                     id="track-title"
                     className="form-input"
-                    required
                     value={paperTitle}
                     onChange={(e) => setPaperTitle(e.target.value)}
+                    onBlur={() => touchField('paperTitle', paperTitle, { required: true })}
                   />
+                  {touched.paperTitle && errors.paperTitle && <span className="form-error">{errors.paperTitle}</span>}
                 </div>
               </>
             )}
