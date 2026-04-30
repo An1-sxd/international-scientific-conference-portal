@@ -4,6 +4,7 @@ import ConferenceSelector from '../components/ConferenceSelector';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
+import FileInput from '../components/FileInput';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchSpeakers, createSpeaker, updateSpeaker, deleteSpeaker } from '../api';
 import { Mic2 } from 'lucide-react';
@@ -105,7 +106,7 @@ export default function Speakers() {
           <div className="form-group"><label>Topic</label><input className="form-input" value={form.topic} onChange={(e) => set('topic', e.target.value)} /></div>
           <div className="form-group"><label>Email</label><input className="form-input" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} /></div>
           <div className="form-group"><label>Biography</label><textarea className="form-textarea" value={form.biography} onChange={(e) => set('biography', e.target.value)} /></div>
-          <div className="form-group"><label>Photo</label><input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files[0])} style={{color:'var(--clr-text-dim)',fontSize:'var(--fs-sm)'}} /></div>
+          <div className="form-group"><label>Photo</label><FileInput accept="image/*" onChange={(e) => setPhoto(e.target.files[0] || null)} /></div>
         </Modal>
       )}
       {confirmTarget && (

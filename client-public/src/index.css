@@ -326,6 +326,50 @@ code   { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.9em
   }
 }
 
+
+/* ── Custom File Input ───────────────────────────────────── */
+.file-input {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  padding: 0.65rem 1rem;
+  background: var(--clr-surface-2);
+  border: 1.5px dashed var(--clr-border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.file-input:hover { border-color: var(--clr-primary); background: rgba(99,102,241,.04); }
+.file-input--has-file { border-style: solid; border-color: var(--clr-primary); background: rgba(99,102,241,.06); }
+.file-input--disabled { opacity: .5; cursor: not-allowed; }
+.file-input__native { display: none; }
+.file-input__icon { color: var(--clr-text-muted); display: flex; flex-shrink: 0; transition: color var(--dur) var(--ease); }
+.file-input--has-file .file-input__icon { color: var(--clr-primary-h); }
+.file-input__text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-input--has-file .file-input__text { color: var(--clr-text); }
+.file-input__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border: none;
+  background: var(--clr-surface-3);
+  color: var(--clr-text-dim);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.file-input__clear:hover { background: var(--clr-danger); color: #fff; }
+
 /* ── Grid helpers ─────────────────────────────────────────── */
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-xl); }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-xl); }

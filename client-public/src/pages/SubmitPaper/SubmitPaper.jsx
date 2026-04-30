@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchConferences, fetchThemes, submitPaper } from "../../api";
 import { CheckCircle2, X } from "lucide-react";
+import FileInput from "../../components/FileInput";
 import "./SubmitPaper.css";
 
 export default function SubmitPaper() {
@@ -216,11 +217,9 @@ export default function SubmitPaper() {
 
             <div className="form-group">
               <label htmlFor="sp-pdf">PDF File</label>
-              <input
+              <FileInput
                 id="sp-pdf"
-                type="file"
                 accept=".pdf"
-                className="form-input"
                 onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
               />
             </div>
