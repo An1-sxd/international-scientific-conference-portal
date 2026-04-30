@@ -50,6 +50,12 @@
   margin-bottom: var(--sp-lg);
 }
 .author-block:last-of-type { margin-bottom: 0; }
+.author-block .form-input,
+.author-block .form-select,
+.author-block .form-textarea {
+  background: var(--clr-bg);
+  border-color: var(--clr-border);
+}
 
 .author-block__header {
   display: flex;
