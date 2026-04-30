@@ -137,9 +137,9 @@
   color: inherit;
 }
 .speaker-card__avatar {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
+  width: 100px;
+  height: 120px;
+  border-radius: var(--r-lg);
   overflow: hidden;
   border: 2px solid var(--clr-border-2);
   display: flex;
@@ -148,6 +148,7 @@
   background: var(--clr-surface-2);
   margin-bottom: var(--sp-sm);
   flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,.2);
 }
 .speaker-card__img {
   width: 100%;
