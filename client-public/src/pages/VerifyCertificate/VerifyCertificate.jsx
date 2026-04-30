@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { checkCertificateStatus } from "../../api";
+import { XCircle, Clock, CheckCircle2, Eye, Download } from "lucide-react";
 import "./VerifyCertificate.css";
 
 export default function VerifyCertificate() {
@@ -126,7 +127,7 @@ export default function VerifyCertificate() {
                   <div className="cert-status-card__body">
                     {entry.certificateStatus === "not_accepted" && (
                       <div className="cert-status-msg cert-status-msg--danger">
-                        <span className="cert-status-msg__icon">✕</span>
+                        <span className="cert-status-msg__icon"><XCircle size={22} strokeWidth={2} /></span>
                         <div>
                           <strong>Registration Refused</strong>
                           <p>
@@ -139,7 +140,7 @@ export default function VerifyCertificate() {
 
                     {entry.certificateStatus === "not_ready" && (
                       <div className="cert-status-msg cert-status-msg--warning">
-                        <span className="cert-status-msg__icon">⏳</span>
+                        <span className="cert-status-msg__icon"><Clock size={22} strokeWidth={2} /></span>
                         <div>
                           <strong>Certificate Not Ready</strong>
                           <p>
@@ -154,7 +155,7 @@ export default function VerifyCertificate() {
                     {entry.certificateStatus === "ready" && (
                       <>
                         <div className="cert-status-msg cert-status-msg--success">
-                          <span className="cert-status-msg__icon">✓</span>
+                          <span className="cert-status-msg__icon"><CheckCircle2 size={22} strokeWidth={2} /></span>
                           <div>
                             <strong>Certificate Ready!</strong>
                             <p>
@@ -215,14 +216,14 @@ export default function VerifyCertificate() {
                                   rel="noreferrer"
                                   className="btn btn--primary"
                                 >
-                                  👁️ View Certificate
+                                  <Eye size={16} strokeWidth={2} /> View Certificate
                                 </a>
                                 <a
                                   href={entry.certificate.pdfUrl}
                                   download
                                   className="btn btn--outline"
                                 >
-                                  ⬇️ Download PDF
+                                  <Download size={16} strokeWidth={2} /> Download PDF
                                 </a>
                               </div>
                             )}

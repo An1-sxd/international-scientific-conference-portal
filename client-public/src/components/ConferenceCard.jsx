@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CalendarDays, MapPin } from "lucide-react";
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
@@ -28,12 +29,12 @@ export default function ConferenceCard({ conference }) {
 
       <div className="conf-card__meta">
         <div className="conf-card__meta-item">
-          <span className="conf-card__icon">📅</span>
+          <span className="conf-card__icon"><CalendarDays size={16} strokeWidth={2} /></span>
           <span>{formatDate(c.startDate)} — {formatDate(c.endDate)}</span>
         </div>
         {c.venue && (
           <div className="conf-card__meta-item">
-            <span className="conf-card__icon">📍</span>
+            <span className="conf-card__icon"><MapPin size={16} strokeWidth={2} /></span>
             <span>{c.venue}{c.city ? `, ${c.city}` : ""}</span>
           </div>
         )}

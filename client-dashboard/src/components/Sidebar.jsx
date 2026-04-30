@@ -1,24 +1,28 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
+import {
+  LayoutDashboard, Building2, Mic2, CalendarDays, Tag,
+  ClipboardList, Users, FileText, BookOpen, Award, LogOut,
+} from 'lucide-react';
 
 const links = [
   { label: 'OVERVIEW', items: [
-    { to: '/', icon: '📊', text: 'Dashboard' },
+    { to: '/', icon: LayoutDashboard, text: 'Dashboard' },
   ]},
   { label: 'MANAGEMENT', items: [
-    { to: '/conferences', icon: '🏛️', text: 'Conferences' },
-    { to: '/speakers', icon: '🎤', text: 'Speakers' },
-    { to: '/sessions', icon: '📅', text: 'Sessions' },
-    { to: '/themes', icon: '🏷️', text: 'Themes' },
+    { to: '/conferences', icon: Building2, text: 'Conferences' },
+    { to: '/speakers', icon: Mic2, text: 'Speakers' },
+    { to: '/sessions', icon: CalendarDays, text: 'Sessions' },
+    { to: '/themes', icon: Tag, text: 'Themes' },
   ]},
   { label: 'PEOPLE', items: [
-    { to: '/registrations', icon: '📝', text: 'Registrations' },
-    { to: '/participants', icon: '👥', text: 'Participants' },
-    { to: '/submissions', icon: '📄', text: 'Submissions' },
-    { to: '/researches', icon: '📚', text: 'Researches' },
+    { to: '/registrations', icon: ClipboardList, text: 'Registrations' },
+    { to: '/participants', icon: Users, text: 'Participants' },
+    { to: '/submissions', icon: FileText, text: 'Submissions' },
+    { to: '/researches', icon: BookOpen, text: 'Researches' },
   ]},
   { label: 'CREDENTIALS', items: [
-    { to: '/certificates', icon: '🎓', text: 'Certificates' },
+    { to: '/certificates', icon: Award, text: 'Certificates' },
   ]},
 ];
 
@@ -58,7 +62,7 @@ export default function Sidebar() {
                   `sidebar__link${isActive ? ' sidebar__link--active' : ''}`
                 }
               >
-                <span className="icon">{link.icon}</span>
+                <link.icon size={18} strokeWidth={2} />
                 {link.text}
               </NavLink>
             ))}
@@ -77,7 +81,7 @@ export default function Sidebar() {
           </div>
         </div>
         <button className="sidebar__logout" onClick={handleLogout} title="Logout">
-          🚪
+          <LogOut size={16} strokeWidth={2} />
         </button>
       </div>
     </aside>

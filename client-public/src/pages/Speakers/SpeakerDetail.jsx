@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchSpeakerById } from "../../api";
+import { Building2, MapPin, Mail } from "lucide-react";
 import "./SpeakerDetail.css";
 
 export default function SpeakerDetail() {
@@ -51,19 +52,19 @@ export default function SpeakerDetail() {
               <div className="speaker-detail__meta">
                 {speaker.affiliation && (
                   <div className="speaker-detail__meta-item">
-                    <span>🏛️</span>
+                    <span><Building2 size={16} strokeWidth={2} /></span>
                     <span>{speaker.affiliation}</span>
                   </div>
                 )}
                 {speaker.country && (
                   <div className="speaker-detail__meta-item">
-                    <span>📍</span>
+                    <span><MapPin size={16} strokeWidth={2} /></span>
                     <span>{speaker.country}</span>
                   </div>
                 )}
                 {speaker.email && (
                   <div className="speaker-detail__meta-item">
-                    <span>✉️</span>
+                    <span><Mail size={16} strokeWidth={2} /></span>
                     <a href={`mailto:${speaker.email}`}>{speaker.email}</a>
                   </div>
                 )}

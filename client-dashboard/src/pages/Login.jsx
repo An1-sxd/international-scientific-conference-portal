@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider';
+import { AlertTriangle, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const { login } = useAuth();
@@ -49,7 +50,7 @@ export default function Login() {
 
           {error && (
             <div className="login-card__error">
-              <span>⚠️</span> {error}
+              <AlertTriangle size={16} strokeWidth={2} /> {error}
             </div>
           )}
 
@@ -87,7 +88,7 @@ export default function Login() {
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? <EyeOff size={18} strokeWidth={2} /> : <Eye size={18} strokeWidth={2} />}
               </button>
             </div>
           </div>

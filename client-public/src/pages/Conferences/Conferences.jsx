@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchConferences } from "../../api";
 import ConferenceCard from "../../components/ConferenceCard";
 import Pagination from "../../components/Pagination";
+import { Inbox } from "lucide-react";
 import "./Conferences.css";
 
 const PER_PAGE = 8;
@@ -44,7 +45,7 @@ export default function Conferences() {
           </>
         ) : (
           <div className="empty-state">
-            <div className="empty-state__icon">📭</div>
+            <div className="empty-state__icon"><Inbox size={48} strokeWidth={1.5} /></div>
             <div className="empty-state__title">No conferences found</div>
           </div>
         )}

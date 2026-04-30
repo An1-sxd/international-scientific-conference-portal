@@ -4,6 +4,7 @@ import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchConferences as apiFetch, createConference, updateConference, deleteConference } from '../api';
+import { Building2 } from 'lucide-react';
 
 const empty = { name: '', slogan: '', description: '', startDate: '', endDate: '', venue: '', city: '', country: '', contactEmail: '', isActive: true };
 
@@ -67,7 +68,7 @@ export default function Conferences() {
             </div>
           </div>
           {loading ? <div className="loader-wrap"><div className="loader" /></div> : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">🏛️</div><div className="empty-state__title">No conferences found</div></div>
+            <div className="empty-state"><div className="empty-state__icon"><Building2 size={48} strokeWidth={1.5} /></div><div className="empty-state__title">No conferences found</div></div>
           ) : (
             <table>
               <thead><tr><th>Name</th><th>Dates</th><th>Venue</th><th>Status</th><th>Actions</th></tr></thead>

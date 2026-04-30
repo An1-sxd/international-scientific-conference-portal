@@ -1,4 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
+import { GraduationCap } from "lucide-react";
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -6,7 +7,7 @@ export default function Navbar() {
     <nav className="navbar" id="main-navbar">
       <div className="container navbar__inner">
         <Link to="/" className="navbar__brand" id="navbar-brand">
-          <span className="navbar__logo-icon">🎓</span>
+          <span className="navbar__logo-icon"><GraduationCap size={24} strokeWidth={2} /></span>
           <span className="navbar__logo-text">
             Blida<span className="text-gradient">1</span> Portal
           </span>

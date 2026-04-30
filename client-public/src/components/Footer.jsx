@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { GraduationCap } from "lucide-react";
 import "./Footer.css";
 
 export default function Footer() {
@@ -7,7 +8,7 @@ export default function Footer() {
       <div className="container">
         <div className="footer__top">
           <div className="footer__brand">
-            <span className="footer__logo">🎓</span>
+            <span className="footer__logo"><GraduationCap size={28} strokeWidth={2} /></span>
             <div>
               <h3 className="footer__title">Blida1 Portal</h3>
               <p className="footer__tagline">

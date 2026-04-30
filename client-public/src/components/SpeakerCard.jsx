@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { MapPin } from "lucide-react";
 
 export default function SpeakerCard({ speaker }) {
   const initials = speaker.fullName
@@ -23,7 +24,7 @@ export default function SpeakerCard({ speaker }) {
       )}
       {speaker.country && (
         <span className="badge badge--accent speaker-card__country">
-          📍 {speaker.country}
+          <MapPin size={12} strokeWidth={2} /> {speaker.country}
         </span>
       )}
       {speaker.topic && (

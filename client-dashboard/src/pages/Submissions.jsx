@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FileText } from 'lucide-react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
@@ -65,7 +66,7 @@ export default function Submissions() {
             </div>
           </div>
           {loading ? <div className="loader-wrap"><div className="loader" /></div> : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">📄</div><div className="empty-state__title">No submissions</div></div>
+            <div className="empty-state"><div className="empty-state__icon"><FileText size={48} strokeWidth={1.5} /></div><div className="empty-state__title">No submissions</div></div>
           ) : (
             <table>
               <thead><tr><th>ID</th><th>Title</th><th>Theme</th><th>Authors</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>

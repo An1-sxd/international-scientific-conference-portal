@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchConferences, fetchThemes, submitPaper } from "../../api";
+import { CheckCircle2, X } from "lucide-react";
 import "./SubmitPaper.css";
 
 export default function SubmitPaper() {
@@ -98,7 +99,7 @@ export default function SubmitPaper() {
       <div className="section fade-in">
         <div className="container">
           <div className="submit-success" id="submission-success">
-            <div className="submit-success__icon">🎉</div>
+            <div className="submit-success__icon"><CheckCircle2 size={48} strokeWidth={1.5} /></div>
             <h1 className="submit-success__title">Paper Submitted Successfully!</h1>
             <p className="submit-success__msg">Your submission ID is:</p>
             <span className="submit-success__id">{result.submissionId}</span>
@@ -253,7 +254,7 @@ export default function SubmitPaper() {
                       className="author-block__remove"
                       onClick={() => removeAuthor(idx)}
                     >
-                      ✕
+                      <X size={16} strokeWidth={2} />
                     </button>
                   )}
                 </div>

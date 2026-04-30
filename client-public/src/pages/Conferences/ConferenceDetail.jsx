@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchConferenceById, registerForConference } from "../../api";
 import SpeakerCard from "../../components/SpeakerCard";
+import { CalendarDays, MapPin, Mail, DoorOpen, X, CheckCircle2 } from "lucide-react";
 import "./ConferenceDetail.css";
 
 function fmt(dateStr) {
@@ -81,18 +82,18 @@ export default function ConferenceDetail() {
 
             <div className="conf-detail__meta-row">
               <div className="conf-detail__meta-item">
-                <span>📅</span>
+                <span><CalendarDays size={16} strokeWidth={2} /></span>
                 <span>{fmt(conf.startDate)} — {fmt(conf.endDate)}</span>
               </div>
               {conf.venue && (
                 <div className="conf-detail__meta-item">
-                  <span>📍</span>
+                  <span><MapPin size={16} strokeWidth={2} /></span>
                   <span>{conf.venue}{conf.city ? `, ${conf.city}` : ""}</span>
                 </div>
               )}
               {conf.contactEmail && (
                 <div className="conf-detail__meta-item">
-                  <span>✉️</span>
+                  <span><Mail size={16} strokeWidth={2} /></span>
                   <a href={`mailto:${conf.contactEmail}`}>{conf.contactEmail}</a>
                 </div>
               )}
@@ -164,7 +165,7 @@ export default function ConferenceDetail() {
                         {s.themeId && (
                           <span className="badge badge--accent">{s.themeId.code || s.themeId.label}</span>
                         )}
-                        {s.room && <span className="badge badge--primary">🚪 {s.room}</span>}
+                        {s.room && <span className="badge badge--primary"><DoorOpen size={14} strokeWidth={2} /> {s.room}</span>}
                       </div>
                       {s.speakerId && (
                         <Link to={`/speakers/${s.speakerId._id}`} className="agenda-item__speaker">
@@ -196,11 +197,11 @@ export default function ConferenceDetail() {
       {showRegModal && (
         <div className="modal-overlay" onClick={() => setShowRegModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()} id="registration-modal">
-            <button className="modal__close" onClick={() => setShowRegModal(false)}>✕</button>
+            <button className="modal__close" onClick={() => setShowRegModal(false)}><X size={18} strokeWidth={2} /></button>
 
             {regResult ? (
               <div className="modal__success">
-                <div className="modal__success-icon">✅</div>
+                <div className="modal__success-icon"><CheckCircle2 size={48} strokeWidth={1.5} /></div>
                 <h2>Registration Successful!</h2>
                 <p>Your registration ID is:</p>
                 <span className="modal__reg-id">{regResult.registrationId}</span>

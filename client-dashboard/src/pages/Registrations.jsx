@@ -4,6 +4,7 @@ import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchRegistrations, updateRegistrationStatus } from '../api';
+import { ClipboardList } from 'lucide-react';
 
 const STATUSES = ['PENDING', 'ACCEPTED', 'REFUSED'];
 
@@ -67,7 +68,7 @@ export default function Registrations() {
           {loading ? (
             <div className="loader-wrap"><div className="loader" /></div>
           ) : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">📝</div><div className="empty-state__title">No registrations</div></div>
+            <div className="empty-state"><div className="empty-state__icon"><ClipboardList size={48} strokeWidth={1.5} /></div><div className="empty-state__title">No registrations</div></div>
           ) : (
             <table>
               <thead>

@@ -5,6 +5,7 @@ import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchSpeakers, createSpeaker, updateSpeaker, deleteSpeaker } from '../api';
+import { Mic2 } from 'lucide-react';
 
 const empty = { fullName: '', academicTitle: '', affiliation: '', country: '', topic: '', biography: '', email: '' };
 
@@ -59,14 +60,14 @@ export default function Speakers() {
             </div>
           </div>
           {loading ? <div className="loader-wrap"><div className="loader" /></div> : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">🎤</div><div className="empty-state__title">No speakers</div></div>
+            <div className="empty-state"><div className="empty-state__icon"><Mic2 size={48} strokeWidth={1.5} /></div><div className="empty-state__title">No speakers</div></div>
           ) : (
             <table>
               <thead><tr><th>Photo</th><th>Name</th><th>Title</th><th>Affiliation</th><th>Topic</th><th>Actions</th></tr></thead>
               <tbody>
                 {filtered.map((s) => (
                   <tr key={s._id}>
-                    <td>{s.photoUrl ? <img src={s.photoUrl} alt="" style={{width:36,height:36,borderRadius:'50%',objectFit:'cover'}} /> : <div style={{width:36,height:36,borderRadius:'50%',background:'var(--clr-surface-2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.8rem'}}>🎤</div>}</td>
+                    <td>{s.photoUrl ? <img src={s.photoUrl} alt="" style={{width:36,height:36,borderRadius:'50%',objectFit:'cover'}} /> : <div style={{width:36,height:36,borderRadius:'50%',background:'var(--clr-surface-2)',display:'flex',alignItems:'center',justifyContent:'center'}}><Mic2 size={16} strokeWidth={2} /></div>}</td>
                     <td><strong>{s.fullName}</strong></td>
                     <td>{s.academicTitle || '—'}</td>
                     <td>{s.affiliation || '—'}</td>

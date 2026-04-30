@@ -5,6 +5,7 @@ import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchThemes, createTheme, updateTheme, deleteTheme } from '../api';
+import { Tag } from 'lucide-react';
 
 const empty = { code: '', label: '', description: '', displayOrder: 0 };
 
@@ -50,7 +51,7 @@ export default function Themes() {
             </div>
           </div>
           {loading ? <div className="loader-wrap"><div className="loader" /></div> : items.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">🏷️</div><div className="empty-state__title">No themes</div></div>
+            <div className="empty-state"><div className="empty-state__icon"><Tag size={48} strokeWidth={1.5} /></div><div className="empty-state__title">No themes</div></div>
           ) : (
             <table>
               <thead><tr><th>Order</th><th>Code</th><th>Label</th><th>Description</th><th>Actions</th></tr></thead>

@@ -9,6 +9,7 @@ import {
 } from "../../api";
 import ConferenceCard from "../../components/ConferenceCard";
 import SpeakerCard from "../../components/SpeakerCard";
+import { GraduationCap, Inbox, Mic2, Tag } from "lucide-react";
 import "./Home.css";
 
 export default function Home() {
@@ -68,7 +69,7 @@ export default function Home() {
 
         <div className="container hero__content fade-in">
           <span className="badge badge--primary hero__badge">
-            🎓 Université Blida 1
+            <GraduationCap size={18} strokeWidth={2} /> Université Blida 1
           </span>
           <h1 className="hero__title">
             International Scientific<br />
@@ -138,7 +139,7 @@ export default function Home() {
             </>
           ) : (
             <div className="empty-state">
-              <div className="empty-state__icon">📭</div>
+              <div className="empty-state__icon"><Inbox size={48} strokeWidth={1.5} /></div>
               <div className="empty-state__title">No conferences yet</div>
               <p>Stay tuned for upcoming events.</p>
             </div>
@@ -171,7 +172,7 @@ export default function Home() {
             </>
           ) : (
             <div className="empty-state">
-              <div className="empty-state__icon">🎤</div>
+              <div className="empty-state__icon"><Mic2 size={48} strokeWidth={1.5} /></div>
               <div className="empty-state__title">No speakers yet</div>
               <p>Speakers will be announced soon.</p>
             </div>
@@ -205,7 +206,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="empty-state">
-              <div className="empty-state__icon">🏷️</div>
+              <div className="empty-state__icon"><Tag size={48} strokeWidth={1.5} /></div>
               <div className="empty-state__title">No themes yet</div>
               <p>Themes will be announced soon.</p>
             </div>

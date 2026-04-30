@@ -4,6 +4,7 @@ import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchResearches } from '../api';
+import { BookOpen, FileText } from 'lucide-react';
 
 const STATUS_STYLE = {
   ACCEPTED: 'success',
@@ -72,7 +73,7 @@ export default function Researches() {
             <div className="loader-wrap"><div className="loader" /></div>
           ) : filtered.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-state__icon">📚</div>
+              <div className="empty-state__icon"><BookOpen size={48} strokeWidth={1.5} /></div>
               <div className="empty-state__title">No accepted or published papers</div>
               <p style={{ color: 'var(--clr-text-muted)', fontSize: 'var(--fs-sm)', marginTop: 'var(--sp-sm)' }}>
                 Accept or publish submissions from the Submissions page to see them here.
@@ -119,7 +120,7 @@ export default function Researches() {
                         <td>{new Date(s.submittedAt).toLocaleDateString()}</td>
                         <td>
                           {s.pdfUrl ? (
-                            <a href={s.pdfUrl} target="_blank" rel="noreferrer" className="btn btn--ghost btn--sm">📄 View</a>
+                            <a href={s.pdfUrl} target="_blank" rel="noreferrer" className="btn btn--ghost btn--sm"><FileText size={14} strokeWidth={2} /> View</a>
                           ) : '—'}
                         </td>
                         <td>

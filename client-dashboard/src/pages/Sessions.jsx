@@ -5,6 +5,7 @@ import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchSessions, createSession, updateSession, deleteSession, fetchThemes, fetchSpeakers } from '../api';
+import { CalendarDays } from 'lucide-react';
 
 const empty = { sessionTitle: '', themeId: '', speakerId: '', startsAt: '', endsAt: '', room: '', description: '' };
 
@@ -70,7 +71,7 @@ export default function Sessions() {
             </div>
           </div>
           {loading ? <div className="loader-wrap"><div className="loader" /></div> : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">📅</div><div className="empty-state__title">No sessions</div></div>
+            <div className="empty-state"><div className="empty-state__icon"><CalendarDays size={48} strokeWidth={1.5} /></div><div className="empty-state__title">No sessions</div></div>
           ) : (
             <table>
               <thead><tr><th>Title</th><th>Theme</th><th>Speaker</th><th>Start</th><th>End</th><th>Room</th><th>Actions</th></tr></thead>

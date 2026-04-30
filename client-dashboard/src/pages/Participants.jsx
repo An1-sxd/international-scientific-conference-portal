@@ -5,6 +5,7 @@ import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchParticipants, updateParticipant, deleteParticipant, updateRegistrationStatus } from '../api';
+import { Users } from 'lucide-react';
 
 const TYPES = ['STUDENT', 'RESEARCHER', 'PROFESSOR', 'GUEST', 'INDUSTRY'];
 
@@ -54,7 +55,7 @@ export default function Participants() {
       await updateRegistrationStatus(p.registrationRef, { attendanceConfirmed: !p.attendanceConfirmed });
       load();
       setToast({
-        msg: p.attendanceConfirmed ? `${p.fullName} marked as absent` : `${p.fullName} marked as present ✓`,
+        msg: p.attendanceConfirmed ? `${p.fullName} marked as absent` : `${p.fullName} marked as present`,
         type: 'success',
       });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
@@ -94,7 +95,7 @@ export default function Participants() {
           {loading ? (
             <div className="loader-wrap"><div className="loader" /></div>
           ) : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state__icon">👥</div><div className="empty-state__title">No accepted participants for this conference</div></div>
+            <div className="empty-state"><div className="empty-state__icon"><Users size={48} strokeWidth={1.5} /></div><div className="empty-state__title">No accepted participants for this conference</div></div>
           ) : (
             <table>
               <thead>

@@ -4,6 +4,7 @@ import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchCertificates, generateCertificatesBatch, uploadCertificatePdf, generateCertificatePdf } from '../api';
+import { Award, Zap, Paperclip } from 'lucide-react';
 
 export default function Certificates() {
   const { selectedId } = useConference();
@@ -88,7 +89,7 @@ export default function Certificates() {
                 onClick={batchGenerate}
                 disabled={generating}
               >
-                {generating ? 'Generating…' : '🎓 Generate All Certificates'}
+                {generating ? 'Generating…' : <><Award size={16} strokeWidth={2} /> Generate All Certificates</>}
               </button>
             </div>
           </div>
@@ -108,7 +109,7 @@ export default function Certificates() {
             <div className="loader-wrap"><div className="loader" /></div>
           ) : filtered.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-state__icon">🎓</div>
+              <div className="empty-state__icon"><Award size={48} strokeWidth={1.5} /></div>
               <div className="empty-state__title">No certificates generated</div>
               <p style={{ color: 'var(--clr-text-muted)', fontSize: 'var(--fs-sm)', marginTop: 'var(--sp-sm)' }}>
                 Mark participants as present in the Participants page, then click "Generate All Certificates".
@@ -148,10 +149,10 @@ export default function Certificates() {
                             onClick={() => handleGeneratePdf(c._id)}
                             disabled={generatingPdf === c._id}
                           >
-                            {generatingPdf === c._id ? 'Generating…' : '⚡ Auto Generate'}
+                            {generatingPdf === c._id ? 'Generating…' : <><Zap size={14} strokeWidth={2} /> Auto Generate</>}
                           </button>
                           <label className="btn btn--outline btn--sm" style={{ cursor: 'pointer' }}>
-                            {uploading === c._id ? 'Uploading…' : '📎 Upload'}
+                            {uploading === c._id ? 'Uploading…' : <><Paperclip size={14} strokeWidth={2} /> Upload</>}
                             <input
                               type="file"
                               accept=".pdf"

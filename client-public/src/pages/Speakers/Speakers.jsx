@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchSpeakers } from "../../api";
 import SpeakerCard from "../../components/SpeakerCard";
 import Pagination from "../../components/Pagination";
+import { Mic2 } from "lucide-react";
 import "./Speakers.css";
 
 const PER_PAGE = 8;
@@ -44,7 +45,7 @@ export default function Speakers() {
           </>
         ) : (
           <div className="empty-state">
-            <div className="empty-state__icon">🎤</div>
+            <div className="empty-state__icon"><Mic2 size={48} strokeWidth={1.5} /></div>
             <div className="empty-state__title">No speakers found</div>
           </div>
         )}

@@ -3,6 +3,19 @@ import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import { useConference } from '../components/ConferenceProvider';
 import { fetchDashboardStats } from '../api';
+import {
+  Mic2, CalendarDays, FileText, ClipboardList,
+  CheckCircle2, Award, Building2,
+} from 'lucide-react';
+
+const iconMap = {
+  Speakers: Mic2,
+  Sessions: CalendarDays,
+  Submissions: FileText,
+  Registrations: ClipboardList,
+  Confirmed: CheckCircle2,
+  Certificates: Award,
+};
 
 export default function Dashboard() {
   const { selectedId, selected, loading: confLoading } = useConference();
@@ -20,12 +33,12 @@ export default function Dashboard() {
 
   const cards = stats
     ? [
-        { icon: '🎤', label: 'Speakers', value: stats.totalSpeakers, variant: 'primary' },
-        { icon: '📅', label: 'Sessions', value: stats.totalSessions, variant: 'accent' },
-        { icon: '📄', label: 'Submissions', value: stats.totalSubmissions, variant: 'warning' },
-        { icon: '📝', label: 'Registrations', value: stats.totalRegistrations, variant: 'success' },
-        { icon: '✅', label: 'Confirmed', value: stats.confirmedRegistrations, variant: 'success' },
-        { icon: '🎓', label: 'Certificates', value: stats.totalCertificates, variant: 'primary' },
+        { label: 'Speakers', value: stats.totalSpeakers, variant: 'primary' },
+        { label: 'Sessions', value: stats.totalSessions, variant: 'accent' },
+        { label: 'Submissions', value: stats.totalSubmissions, variant: 'warning' },
+        { label: 'Registrations', value: stats.totalRegistrations, variant: 'success' },
+        { label: 'Confirmed', value: stats.confirmedRegistrations, variant: 'success' },
+        { label: 'Certificates', value: stats.totalCertificates, variant: 'primary' },
       ]
     : [];
 
@@ -41,7 +54,7 @@ export default function Dashboard() {
           <div className="loader-wrap"><div className="loader" /></div>
         ) : !selected ? (
           <div className="empty-state">
-            <div className="empty-state__icon">🏛️</div>
+            <div className="empty-state__icon"><Building2 size={48} strokeWidth={1.5} /></div>
             <div className="empty-state__title">No conference selected</div>
             <p>Create a conference to get started.</p>
           </div>
@@ -57,13 +70,18 @@ export default function Dashboard() {
             </div>
 
             <div className="stats-grid">
-              {cards.map((c) => (
-                <div className="stat-card" key={c.label}>
-                  <div className={`stat-card__icon stat-card__icon--${c.variant}`}>{c.icon}</div>
-                  <div className="stat-card__value">{c.value}</div>
-                  <div className="stat-card__label">{c.label}</div>
-                </div>
-              ))}
+              {cards.map((c) => {
+                const Icon = iconMap[c.label];
+                return (
+                  <div className="stat-card" key={c.label}>
+                    <div className={`stat-card__icon stat-card__icon--${c.variant}`}>
+                      <Icon size={22} strokeWidth={2} />
+                    </div>
+                    <div className="stat-card__value">{c.value}</div>
+                    <div className="stat-card__label">{c.label}</div>
+                  </div>
+                );
+              })}
             </div>
 
             {Object.keys(submissionBreakdown).length > 0 && (
@@ -92,6 +110,7 @@ export default function Dashboard() {
     </>
   );
 }
+
 
 function statusBadge(s) {
   const map = { PENDING: 'warning', UNDER_REVIEW: 'accent', ACCEPTED: 'success', REJECTED: 'danger', PUBLISHED: 'primary' };
