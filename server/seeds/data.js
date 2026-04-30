@@ -1,111 +1,163 @@
-export const conferenceSeed = {
-  name: "International Scientific Conference 2026",
-  slogan: "Research, Collaboration, and Sustainable Innovation",
-  description:
-    "Demo seed conference dataset for agenda, registration, submission tracking, and certificate workflows.",
-  startDate: new Date("2026-11-12T08:00:00.000Z"),
-  endDate: new Date("2026-11-14T17:30:00.000Z"),
-  venue: "University Central Auditorium",
-  city: "Algiers",
-  country: "Algeria",
-  contactEmail: "seed-conference@portal.test",
-  isActive: true,
-};
+const conferenceBlueprints = [
+  {
+    slug: "isc-2026",
+    name: "International Scientific Conference 2026",
+    slogan: "Research, Collaboration, and Sustainable Innovation",
+    description:
+      "A multidisciplinary conference focused on practical research and collaborative innovation.",
+    startDate: new Date("2026-11-12T08:00:00.000Z"),
+    endDate: new Date("2026-11-14T17:30:00.000Z"),
+    venue: "University Central Auditorium",
+    city: "Algiers",
+    country: "Algeria",
+  },
+  {
+    slug: "aicc-2026",
+    name: "Applied Intelligence and Cloud Conference 2026",
+    slogan: "Scalable Intelligence for Real Systems",
+    description:
+      "Bringing together experts in AI, cloud architecture, and software systems engineering.",
+    startDate: new Date("2026-09-10T08:30:00.000Z"),
+    endDate: new Date("2026-09-12T17:00:00.000Z"),
+    venue: "Digital Innovation Center",
+    city: "Oran",
+    country: "Algeria",
+  },
+  {
+    slug: "dsa-2026",
+    name: "Data Systems and Analytics Forum 2026",
+    slogan: "From Data to Decisions",
+    description:
+      "A forum on data pipelines, analytics governance, and decision-support in modern organizations.",
+    startDate: new Date("2026-10-07T09:00:00.000Z"),
+    endDate: new Date("2026-10-09T16:45:00.000Z"),
+    venue: "Science and Technology Hub",
+    city: "Constantine",
+    country: "Algeria",
+  },
+  {
+    slug: "set-2026",
+    name: "Smart Education Technologies Summit 2026",
+    slogan: "Future-Ready Learning Ecosystems",
+    description:
+      "Discussing learning platforms, accessibility, and technology-enabled pedagogy.",
+    startDate: new Date("2026-05-21T08:30:00.000Z"),
+    endDate: new Date("2026-05-23T17:15:00.000Z"),
+    venue: "Innovation Campus Hall",
+    city: "Tlemcen",
+    country: "Algeria",
+  },
+  {
+    slug: "gsn-2026",
+    name: "Green Systems and Networks Conference 2026",
+    slogan: "Engineering Sustainable Digital Infrastructure",
+    description:
+      "A conference dedicated to energy-aware systems, resilient networks, and sustainability practices.",
+    startDate: new Date("2026-06-18T08:45:00.000Z"),
+    endDate: new Date("2026-06-20T17:00:00.000Z"),
+    venue: "EcoTech Convention Center",
+    city: "Annaba",
+    country: "Algeria",
+  },
+  {
+    slug: "rse-2026",
+    name: "Research Software Engineering Congress 2026",
+    slogan: "Reliable Tools for Reproducible Science",
+    description:
+      "Covering best practices in scientific software quality, reproducibility, and collaboration.",
+    startDate: new Date("2026-07-15T08:00:00.000Z"),
+    endDate: new Date("2026-07-17T16:30:00.000Z"),
+    venue: "National Polytechnic Hall",
+    city: "Sidi Bel Abbes",
+    country: "Algeria",
+  },
+  {
+    slug: "cis-2026",
+    name: "Cybersecurity and Information Safety Expo 2026",
+    slogan: "Trust, Privacy, and Secure Transformation",
+    description:
+      "Focused on applied security, secure-by-design systems, and privacy engineering.",
+    startDate: new Date("2026-12-03T09:00:00.000Z"),
+    endDate: new Date("2026-12-05T17:00:00.000Z"),
+    venue: "Secure Tech Arena",
+    city: "Blida",
+    country: "Algeria",
+  },
+];
 
-export const themeSeeds = [
+const themeTemplates = [
   {
     key: "ai",
     code: "AI",
     label: "Artificial Intelligence",
-    description: "Applied AI, responsible systems, and intelligent services.",
+    description:
+      "Applied AI systems, responsible automation, and intelligent services.",
     displayOrder: 1,
   },
   {
     key: "data",
     code: "DATA",
-    label: "Data Science and Analytics",
-    description: "Data pipelines, predictive analytics, and evidence-driven research.",
+    label: "Data Science",
+    description:
+      "Data engineering, analytics workflows, and evidence-driven decision models.",
     displayOrder: 2,
   },
   {
-    key: "energy",
-    code: "ENERGY",
-    label: "Sustainable Energy Systems",
-    description: "Smart energy, renewable systems, and sustainable infrastructure.",
+    key: "web",
+    code: "WEB",
+    label: "Web Engineering",
+    description:
+      "Modern web architectures, user experience, and distributed application delivery.",
     displayOrder: 3,
   },
+  {
+    key: "cyber",
+    code: "CYBER",
+    label: "Cybersecurity",
+    description:
+      "Security practices, threat mitigation, and privacy-preserving systems.",
+    displayOrder: 4,
+  },
 ];
 
-export const speakerSeeds = [
+const speakerTemplates = [
   {
-    key: "leila",
-    fullName: "Prof. Leila Benkacem",
-    academicTitle: "Professor",
-    affiliation: "National School of Computer Science",
-    country: "Algeria",
-    topic: "Ethical AI for Academic Platforms",
-    biography:
-      "Researcher focused on trustworthy machine learning, governance, and digital higher education systems.",
-    photoUrl: "https://images.portal.test/speakers/leila-benkacem.jpg",
-    email: "leila.benkacem@portal.test",
-  },
-  {
-    key: "omar",
-    fullName: "Dr. Omar Rahmani",
+    key: "speaker-1",
+    fullName: "Dr. Sara Khelifi",
     academicTitle: "Associate Professor",
-    affiliation: "Institute of Applied Data Science",
+    affiliation: "National School of AI",
+    country: "Algeria",
+    topic: "Designing Responsible AI Services",
+  },
+  {
+    key: "speaker-2",
+    fullName: "Prof. Karim Ziani",
+    academicTitle: "Professor",
+    affiliation: "Institute of Data and Systems",
+    country: "Algeria",
+    topic: "Practical Data Governance at Scale",
+  },
+  {
+    key: "speaker-3",
+    fullName: "Dr. Lina Bensalem",
+    academicTitle: "Senior Lecturer",
+    affiliation: "School of Web and Media Technologies",
     country: "Tunisia",
-    topic: "Healthcare Analytics and Decision Support",
-    biography:
-      "Works on applied data science for public health, forecasting, and decision-support systems.",
-    photoUrl: "https://images.portal.test/speakers/omar-rahmani.jpg",
-    email: "omar.rahmani@portal.test",
+    topic: "Building Resilient User-Centered Platforms",
+  },
+  {
+    key: "speaker-4",
+    fullName: "Prof. Yacine Meziane",
+    academicTitle: "Professor",
+    affiliation: "Cyber Defense Research Lab",
+    country: "Algeria",
+    topic: "Security by Design for Critical Systems",
   },
 ];
 
-export const sessionSeeds = [
-  {
-    sessionTitle: "Opening Keynote: Ethical AI for Academic Platforms",
-    themeKey: "ai",
-    speakerKey: "leila",
-    startsAt: new Date("2026-11-12T09:00:00.000Z"),
-    endsAt: new Date("2026-11-12T10:00:00.000Z"),
-    room: "Main Hall",
-    description: "Keynote session on trustworthy AI design in university-facing digital services.",
-  },
-  {
-    sessionTitle: "Healthcare Analytics and Decision Support",
-    themeKey: "data",
-    speakerKey: "omar",
-    startsAt: new Date("2026-11-12T10:30:00.000Z"),
-    endsAt: new Date("2026-11-12T11:30:00.000Z"),
-    room: "Room B2",
-    description: "Case studies on predictive analytics and clinical decision support pipelines.",
-  },
-  {
-    sessionTitle: "Renewable Grid Planning Roundtable",
-    themeKey: "energy",
-    speakerKey: null,
-    startsAt: new Date("2026-11-13T13:30:00.000Z"),
-    endsAt: new Date("2026-11-13T14:30:00.000Z"),
-    room: "Room C1",
-    description: "Panel slot reserved for the sustainable energy track before a speaker is assigned.",
-  },
-  {
-    sessionTitle: "Applied AI Poster Walkthrough",
-    themeKey: "ai",
-    speakerKey: "leila",
-    startsAt: new Date("2026-11-14T11:00:00.000Z"),
-    endsAt: new Date("2026-11-14T12:00:00.000Z"),
-    room: "Innovation Lab",
-    description: "Guided overview of selected poster contributions in the AI track.",
-  },
-];
-
-export const participantSeeds = [
+const participantTemplates = [
   {
     fullName: "Amina Belhadj",
-    email: "amina.belhadj@portal.test",
     phone: "+213555000101",
     affiliation: "USTHB",
     country: "Algeria",
@@ -113,7 +165,6 @@ export const participantSeeds = [
   },
   {
     fullName: "Youssef Mansouri",
-    email: "youssef.mansouri@portal.test",
     phone: "+213555000202",
     affiliation: "University of Oran",
     country: "Algeria",
@@ -121,114 +172,246 @@ export const participantSeeds = [
   },
   {
     fullName: "Nadia Trabelsi",
-    email: "nadia.trabelsi@portal.test",
     phone: "+216555000303",
     affiliation: "Tunis Institute of Technology",
     country: "Tunisia",
     participantType: "PROFESSOR",
   },
-];
-
-export const registrationSeeds = [
   {
-    participantEmail: "amina.belhadj@portal.test",
-    registrationStatus: "REGISTERED",
-    attendanceConfirmed: false,
-    notes: "Attending as a graduate student presenter.",
-    registeredAt: new Date("2026-10-25T09:15:00.000Z"),
-  },
-  {
-    participantEmail: "youssef.mansouri@portal.test",
-    registrationStatus: "CONFIRMED",
-    attendanceConfirmed: true,
-    notes: "Confirmed for conference attendance and certificate generation.",
-    registeredAt: new Date("2026-10-26T10:45:00.000Z"),
-  },
-  {
-    participantEmail: "nadia.trabelsi@portal.test",
-    registrationStatus: "CONFIRMED",
-    attendanceConfirmed: true,
-    notes: "Invited academic participant with confirmed attendance.",
-    registeredAt: new Date("2026-10-27T14:20:00.000Z"),
-  },
-];
-
-export const submissionSeeds = [
-  {
-    paperTitle: "A Practical Framework for Explainable Academic AI Assistants",
-    themeKey: "ai",
-    abstract:
-      "This paper proposes an explainable AI framework for university-facing assistant systems with emphasis on transparency, trust, and operational accountability.",
-    institution: "USTHB",
+    fullName: "Adel Cherif",
+    phone: "+213555000404",
+    affiliation: "Algiers Tech Park",
     country: "Algeria",
-    status: "UNDER_REVIEW",
-    reviewComment: "Assigned to reviewers for methodological assessment.",
-    pdfUrl: "https://files.portal.test/submissions/explainable-academic-ai.pdf",
-    submittedAt: new Date("2026-10-20T08:30:00.000Z"),
-    authors: [
-      {
-        fullName: "Amina Belhadj",
-        email: "amina.belhadj@portal.test",
-        affiliation: "USTHB",
-        country: "Algeria",
-        authorOrder: 1,
-        isCorresponding: true,
-      },
-      {
-        fullName: "Samir Kaci",
-        email: "samir.kaci@portal.test",
-        affiliation: "USTHB",
-        country: "Algeria",
-        authorOrder: 2,
-        isCorresponding: false,
-      },
-    ],
-  },
-  {
-    paperTitle: "Predictive Models for Hospital Resource Allocation",
-    themeKey: "data",
-    abstract:
-      "The study evaluates forecasting techniques for hospital demand planning and resource allocation using interpretable feature engineering and validation pipelines.",
-    institution: "University of Oran",
-    country: "Algeria",
-    status: "ACCEPTED",
-    reviewComment: "Accepted after minor revisions.",
-    pdfUrl: "https://files.portal.test/submissions/hospital-resource-allocation.pdf",
-    submittedAt: new Date("2026-10-21T11:00:00.000Z"),
-    authors: [
-      {
-        fullName: "Youssef Mansouri",
-        email: "youssef.mansouri@portal.test",
-        affiliation: "University of Oran",
-        country: "Algeria",
-        authorOrder: 1,
-        isCorresponding: true,
-      },
-      {
-        fullName: "Nadia Trabelsi",
-        email: "nadia.trabelsi@portal.test",
-        affiliation: "Tunis Institute of Technology",
-        country: "Tunisia",
-        authorOrder: 2,
-        isCorresponding: false,
-      },
-    ],
+    participantType: "INDUSTRY",
   },
 ];
 
-export const certificateSeeds = [
-  {
-    participantEmail: "youssef.mansouri@portal.test",
-    certificateType: "PARTICIPANT",
-    issueDate: new Date("2026-11-14T15:45:00.000Z"),
-    status: "ISSUED",
-    pdfUrl: "https://files.portal.test/certificates/youssef-mansouri.pdf",
-  },
-  {
-    participantEmail: "nadia.trabelsi@portal.test",
-    certificateType: "PARTICIPANT",
-    issueDate: new Date("2026-11-14T16:00:00.000Z"),
-    status: "ISSUED",
-    pdfUrl: "https://files.portal.test/certificates/nadia-trabelsi.pdf",
-  },
-];
+export const conferenceSeeds = conferenceBlueprints.map((conference, index) => {
+  const conferenceOrdinal = index + 1;
+
+  const themeSeeds = themeTemplates.map((themeTemplate) => ({
+    ...themeTemplate,
+  }));
+
+  const speakerSeeds = speakerTemplates.map(
+    (speakerTemplate, speakerIndex) => ({
+      ...speakerTemplate,
+      biography: `${speakerTemplate.fullName} contributes practical and research insights to conference ${conferenceOrdinal}.`,
+      photoUrl: "",
+      email: `${conference.slug}.speaker${speakerIndex + 1}@portal.test`,
+    }),
+  );
+
+  const participantSeeds = participantTemplates.map(
+    (participantTemplate, participantIndex) => ({
+      ...participantTemplate,
+      email: `${conference.slug}.participant${participantIndex + 1}@portal.test`,
+    }),
+  );
+
+  const registrationSeeds = participantSeeds.map(
+    (participantSeed, participantIndex) => ({
+      participantEmail: participantSeed.email,
+      registrationStatus: "PENDING",
+      attendanceConfirmed: false,
+      notes: "Pending admin validation.",
+      registeredAt: new Date(
+        2026,
+        (index + participantIndex) % 12,
+        5 + participantIndex,
+        10,
+        0,
+        0,
+      ),
+    }),
+  );
+
+  const sessionSeeds = [
+    {
+      sessionTitle: `${conference.name} Keynote Session`,
+      themeKey: "ai",
+      speakerKey: "speaker-1",
+      startsAt: new Date(conference.startDate.getTime() + 60 * 60 * 1000),
+      endsAt: new Date(conference.startDate.getTime() + 2 * 60 * 60 * 1000),
+      room: "Main Hall",
+      description:
+        "Opening keynote introducing conference objectives and flagship research topics.",
+    },
+    {
+      sessionTitle: `${conference.name} Data Track Session`,
+      themeKey: "data",
+      speakerKey: "speaker-2",
+      startsAt: new Date(conference.startDate.getTime() + 3 * 60 * 60 * 1000),
+      endsAt: new Date(conference.startDate.getTime() + 4 * 60 * 60 * 1000),
+      room: "Room B1",
+      description:
+        "Applied data science case studies and practical implementation lessons.",
+    },
+    {
+      sessionTitle: `${conference.name} Web Engineering Session`,
+      themeKey: "web",
+      speakerKey: "speaker-3",
+      startsAt: new Date(conference.startDate.getTime() + 5 * 60 * 60 * 1000),
+      endsAt: new Date(conference.startDate.getTime() + 6 * 60 * 60 * 1000),
+      room: "Room C2",
+      description:
+        "Scalable frontend and backend architectures with UX-first decisions.",
+    },
+    {
+      sessionTitle: `${conference.name} Security Session`,
+      themeKey: "cyber",
+      speakerKey: "speaker-4",
+      startsAt: new Date(conference.startDate.getTime() + 7 * 60 * 60 * 1000),
+      endsAt: new Date(conference.startDate.getTime() + 8 * 60 * 60 * 1000),
+      room: "Room D3",
+      description:
+        "Threat modeling, secure architecture, and operational defense strategies.",
+    },
+  ];
+
+  const submissionSeeds = [
+    {
+      paperTitle: `${conference.name}: Explainable AI Workflows`,
+      themeKey: "ai",
+      abstract:
+        "A pending submission discussing explainability patterns and governance controls in applied AI systems.",
+      institution: participantSeeds[0].affiliation,
+      country: participantSeeds[0].country,
+      status: "PENDING",
+      reviewComment: "Awaiting reviewer assignment.",
+      pdfUrl: "",
+      submittedAt: new Date(
+        conference.startDate.getTime() - 20 * 24 * 60 * 60 * 1000,
+      ),
+      authors: [
+        {
+          fullName: participantSeeds[0].fullName,
+          email: participantSeeds[0].email,
+          affiliation: participantSeeds[0].affiliation,
+          country: participantSeeds[0].country,
+          authorOrder: 1,
+          isCorresponding: true,
+        },
+        {
+          fullName: participantSeeds[1].fullName,
+          email: participantSeeds[1].email,
+          affiliation: participantSeeds[1].affiliation,
+          country: participantSeeds[1].country,
+          authorOrder: 2,
+          isCorresponding: false,
+        },
+      ],
+    },
+    {
+      paperTitle: `${conference.name}: Analytics for Decision Support`,
+      themeKey: "data",
+      abstract:
+        "A pending paper on data quality pipelines and explainable analytical decision support.",
+      institution: participantSeeds[1].affiliation,
+      country: participantSeeds[1].country,
+      status: "PENDING",
+      reviewComment: "Awaiting reviewer assignment.",
+      pdfUrl: "",
+      submittedAt: new Date(
+        conference.startDate.getTime() - 19 * 24 * 60 * 60 * 1000,
+      ),
+      authors: [
+        {
+          fullName: participantSeeds[1].fullName,
+          email: participantSeeds[1].email,
+          affiliation: participantSeeds[1].affiliation,
+          country: participantSeeds[1].country,
+          authorOrder: 1,
+          isCorresponding: true,
+        },
+        {
+          fullName: participantSeeds[2].fullName,
+          email: participantSeeds[2].email,
+          affiliation: participantSeeds[2].affiliation,
+          country: participantSeeds[2].country,
+          authorOrder: 2,
+          isCorresponding: false,
+        },
+      ],
+    },
+    {
+      paperTitle: `${conference.name}: UX Patterns for Web Platforms`,
+      themeKey: "web",
+      abstract:
+        "A pending submission exploring practical UX and architecture patterns for web delivery.",
+      institution: participantSeeds[2].affiliation,
+      country: participantSeeds[2].country,
+      status: "PENDING",
+      reviewComment: "Awaiting reviewer assignment.",
+      pdfUrl: "",
+      submittedAt: new Date(
+        conference.startDate.getTime() - 18 * 24 * 60 * 60 * 1000,
+      ),
+      authors: [
+        {
+          fullName: participantSeeds[2].fullName,
+          email: participantSeeds[2].email,
+          affiliation: participantSeeds[2].affiliation,
+          country: participantSeeds[2].country,
+          authorOrder: 1,
+          isCorresponding: true,
+        },
+        {
+          fullName: participantSeeds[3].fullName,
+          email: participantSeeds[3].email,
+          affiliation: participantSeeds[3].affiliation,
+          country: participantSeeds[3].country,
+          authorOrder: 2,
+          isCorresponding: false,
+        },
+      ],
+    },
+    {
+      paperTitle: `${conference.name}: Security by Default`,
+      themeKey: "cyber",
+      abstract:
+        "A pending submission on secure-by-design implementation and risk mitigation in distributed systems.",
+      institution: participantSeeds[3].affiliation,
+      country: participantSeeds[3].country,
+      status: "PENDING",
+      reviewComment: "Awaiting reviewer assignment.",
+      pdfUrl: "",
+      submittedAt: new Date(
+        conference.startDate.getTime() - 17 * 24 * 60 * 60 * 1000,
+      ),
+      authors: [
+        {
+          fullName: participantSeeds[3].fullName,
+          email: participantSeeds[3].email,
+          affiliation: participantSeeds[3].affiliation,
+          country: participantSeeds[3].country,
+          authorOrder: 1,
+          isCorresponding: true,
+        },
+        {
+          fullName: participantSeeds[0].fullName,
+          email: participantSeeds[0].email,
+          affiliation: participantSeeds[0].affiliation,
+          country: participantSeeds[0].country,
+          authorOrder: 2,
+          isCorresponding: false,
+        },
+      ],
+    },
+  ];
+
+  return {
+    conference: {
+      ...conference,
+      contactEmail: `${conference.slug}@portal.test`,
+      isActive: conferenceOrdinal === 1,
+    },
+    themeSeeds,
+    speakerSeeds,
+    sessionSeeds,
+    participantSeeds,
+    registrationSeeds,
+    submissionSeeds,
+    certificateSeeds: [],
+  };
+});
