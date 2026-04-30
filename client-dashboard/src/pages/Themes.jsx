@@ -1,11 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchThemes, createTheme, updateTheme, deleteTheme } from '../api';
+import { useConference } from '../components/conferenceContext';
+import {
+  useAdminThemesQuery,
+  useCreateThemeMutation,
+  useDeleteThemeMutation,
+  useUpdateThemeMutation,
+} from '../hooks/useAdminQueries';
 import { Tag } from 'lucide-react';
 import useFormValidation from '../hooks/useFormValidation';
 
@@ -13,18 +18,16 @@ const empty = { code: '', label: '', description: '', displayOrder: 0 };
 
 export default function Themes() {
   const { selectedId } = useConference();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminThemesQuery(selectedId);
+  const createMutation = useCreateThemeMutation(selectedId);
+  const updateMutation = useUpdateThemeMutation(selectedId);
+  const deleteMutation = useDeleteThemeMutation(selectedId);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(empty);
   const [editId, setEditId] = useState(null);
   const [toast, setToast] = useState(null);
   const [confirmTarget, setConfirmTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
-
-  const load = () => { if (!selectedId) return; setLoading(true); fetchThemes(selectedId).then((r) => setItems(r.data)).catch(() => setItems([])).finally(() => setLoading(false)); };
-  useEffect(() => { load(); }, [selectedId]);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
   const openAdd = () => { setForm(empty); setEditId(null); resetValidation(); setModal('add'); };
@@ -33,23 +36,20 @@ export default function Themes() {
   const save = async () => {
     if (!validate(form, { code: { required: true }, label: { required: true } })) return;
     try {
-      if (modal === 'add') await createTheme(selectedId, form);
-      else await updateTheme(editId, form);
-      setModal(null); load();
+      if (modal === 'add') await createMutation.mutateAsync(form);
+      else await updateMutation.mutateAsync({ id: editId, body: form });
+      setModal(null);
       setToast({ msg: modal === 'add' ? 'Theme created!' : 'Theme updated!', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
   const remove = async () => {
     if (!confirmTarget) return;
-    setDeleting(true);
     try {
-      await deleteTheme(confirmTarget);
+      await deleteMutation.mutateAsync(confirmTarget);
       setConfirmTarget(null);
-      load();
       setToast({ msg: 'Theme deleted.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
-    finally { setDeleting(false); }
   };
 
   return (
@@ -100,7 +100,7 @@ export default function Themes() {
           title="Delete Theme"
           message="Are you sure you want to delete this theme? This action cannot be undone."
           confirmText="Delete"
-          loading={deleting}
+          loading={deleteMutation.isPending}
           onConfirm={remove}
           onCancel={() => setConfirmTarget(null)}
         />

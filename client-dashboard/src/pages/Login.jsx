@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../components/AuthProvider';
+import { useAuth } from '../components/authContext';
 import ThemeToggle from '../components/ThemeToggle';
 import { useTheme } from '../components/theme';
 import { AlertTriangle, Eye, EyeOff } from 'lucide-react';

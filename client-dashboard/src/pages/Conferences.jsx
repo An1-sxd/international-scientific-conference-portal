@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Topbar from '../components/Topbar';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchConferences as apiFetch, createConference, updateConference, deleteConference } from '../api';
+import { useConference } from '../components/conferenceContext';
+import {
+  useAdminConferencesQuery,
+  useCreateConferenceMutation,
+  useDeleteConferenceMutation,
+  useUpdateConferenceMutation,
+} from '../hooks/useAdminQueries';
 import { Building2 } from 'lucide-react';
 import useFormValidation from '../hooks/useFormValidation';
 
@@ -12,19 +17,17 @@ const empty = { name: '', slogan: '', description: '', startDate: '', endDate: '
 
 export default function Conferences() {
   const { refresh } = useConference();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminConferencesQuery();
+  const createMutation = useCreateConferenceMutation();
+  const updateMutation = useUpdateConferenceMutation();
+  const deleteMutation = useDeleteConferenceMutation();
   const [modal, setModal] = useState(null); // 'add' | 'edit'
   const [form, setForm] = useState(empty);
   const [editId, setEditId] = useState(null);
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [confirmTarget, setConfirmTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
-
-  const load = () => apiFetch().then((r) => setItems(r.data)).finally(() => setLoading(false));
-  useEffect(() => { load(); }, []);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -39,10 +42,9 @@ export default function Conferences() {
   const save = async () => {
     if (!validate(form, { name: { required: true }, startDate: { required: true }, endDate: { required: true } })) return;
     try {
-      if (modal === 'add') await createConference(form);
-      else await updateConference(editId, form);
+      if (modal === 'add') await createMutation.mutateAsync(form);
+      else await updateMutation.mutateAsync({ id: editId, body: form });
       setModal(null);
-      await load();
       await refresh();
       setToast({ msg: modal === 'add' ? 'Conference created!' : 'Conference updated!', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
@@ -50,15 +52,12 @@ export default function Conferences() {
 
   const remove = async () => {
     if (!confirmTarget) return;
-    setDeleting(true);
     try {
-      await deleteConference(confirmTarget);
+      await deleteMutation.mutateAsync(confirmTarget);
       setConfirmTarget(null);
-      await load();
       await refresh();
       setToast({ msg: 'Conference deleted.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
-    finally { setDeleting(false); }
   };
 
   const filtered = items.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
@@ -131,7 +130,7 @@ export default function Conferences() {
           title="Delete Conference"
           message="Are you sure you want to delete this conference? All related data (sessions, themes, registrations, etc.) may be affected. This action cannot be undone."
           confirmText="Delete"
-          loading={deleting}
+          loading={deleteMutation.isPending}
           onConfirm={remove}
           onCancel={() => setConfirmTarget(null)}
         />

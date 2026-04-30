@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, X, FileText, Image } from 'lucide-react';
 
-export default function FileInput({ accept, onChange, label, id, disabled = false }) {
+export default function FileInput({ accept, onChange, id, disabled = false }) {
   const [fileName, setFileName] = useState('');
   const inputRef = useRef(null);
 

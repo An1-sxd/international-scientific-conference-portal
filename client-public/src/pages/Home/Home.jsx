@@ -1,55 +1,14 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  fetchStats,
-  fetchActiveConference,
-  fetchSpeakers,
-  fetchThemes,
-  fetchConferences,
-} from "../../api";
+import { useHomeDataQueries } from "../../hooks/usePublicQueries";
 import ConferenceCard from "../../components/ConferenceCard";
 import SpeakerCard from "../../components/SpeakerCard";
 import { GraduationCap, Inbox, Mic2, Tag } from "lucide-react";
 import "./Home.css";
 
 export default function Home() {
-  const [stats, setStats] = useState(null);
-  const [conferences, setConferences] = useState([]);
-  const [speakers, setSpeakers] = useState([]);
-  const [themes, setThemes] = useState([]);
-  const [activeConf, setActiveConf] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { stats, conferences, speakers, themes, isLoading } = useHomeDataQueries();
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [statsRes, confRes, speakersRes, themesRes] = await Promise.allSettled([
-          fetchStats(),
-          fetchConferences(),
-          fetchSpeakers(),
-          fetchThemes(),
-        ]);
-
-        if (statsRes.status === "fulfilled") setStats(statsRes.value.data);
-        if (confRes.status === "fulfilled") setConferences(confRes.value.data || []);
-        if (speakersRes.status === "fulfilled") setSpeakers(speakersRes.value.data || []);
-        if (themesRes.status === "fulfilled") setThemes(themesRes.value.data || []);
-
-        // Try to get active conference for hero
-        try {
-          const activeRes = await fetchActiveConference();
-          setActiveConf(activeRes.data);
-        } catch {}
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="loader-wrap">
         <div className="loader"></div>

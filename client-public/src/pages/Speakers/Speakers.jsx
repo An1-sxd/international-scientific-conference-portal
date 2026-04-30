@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { fetchSpeakers } from "../../api";
+import { useState } from "react";
+import { usePublicSpeakersQuery } from "../../hooks/usePublicQueries";
 import SpeakerCard from "../../components/SpeakerCard";
 import Pagination from "../../components/Pagination";
 import { Mic2, Search } from "lucide-react";
@@ -8,23 +8,14 @@ import "./Speakers.css";
 const PER_PAGE = 8;
 
 export default function Speakers() {
-  const [speakers, setSpeakers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: speakers = [], isLoading, error } = usePublicSpeakersQuery();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [topicFilter, setTopicFilter] = useState("ALL");
   const [countryFilter, setCountryFilter] = useState("ALL");
 
-  useEffect(() => {
-    fetchSpeakers()
-      .then((res) => setSpeakers(res.data || []))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <div className="loader-wrap"><div className="loader"></div></div>;
-  if (error) return <div className="error-box">{error}</div>;
+  if (isLoading) return <div className="loader-wrap"><div className="loader"></div></div>;
+  if (error) return <div className="error-box">{error.message}</div>;
 
   // Extract unique topics and countries for filter dropdowns
   const uniqueTopics = [...new Set(speakers.map((s) => s.topic).filter(Boolean))].sort();

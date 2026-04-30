@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { fetchConferences, fetchThemes } from "../../api";
+import { useState } from "react";
+import { usePublicConferencesQuery, usePublicThemesQuery } from "../../hooks/usePublicQueries";
 import ConferenceCard from "../../components/ConferenceCard";
 import Pagination from "../../components/Pagination";
 import { Inbox, Search } from "lucide-react";
@@ -8,26 +8,19 @@ import "./Conferences.css";
 const PER_PAGE = 8;
 
 export default function Conferences() {
-  const [conferences, setConferences] = useState([]);
-  const [allThemes, setAllThemes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const conferencesQuery = usePublicConferencesQuery();
+  const themesQuery = usePublicThemesQuery();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [themeFilter, setThemeFilter] = useState("ALL");
 
-  useEffect(() => {
-    Promise.all([fetchConferences(), fetchThemes()])
-      .then(([confRes, themeRes]) => {
-        setConferences(confRes.data || []);
-        setAllThemes(themeRes.data || []);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const conferences = conferencesQuery.data || [];
+  const allThemes = themesQuery.data || [];
+  const error = conferencesQuery.error || themesQuery.error;
+  const loading = conferencesQuery.isLoading || themesQuery.isLoading;
 
   if (loading) return <div className="loader-wrap"><div className="loader"></div></div>;
-  if (error) return <div className="error-box">{error}</div>;
+  if (error) return <div className="error-box">{error.message}</div>;
 
   // Build a map: conferenceId -> [theme labels]
   const confThemeMap = {};

@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
-import Toast from '../components/Toast';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchResearches } from '../api';
+import { useConference } from '../components/conferenceContext';
+import { useAdminResearchesQuery } from '../hooks/useAdminQueries';
 import { BookOpen, FileText } from 'lucide-react';
 
 const STATUS_STYLE = {
@@ -13,22 +12,10 @@ const STATUS_STYLE = {
 
 export default function Researches() {
   const { selectedId } = useConference();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState(null);
+  const { data: items = [], isLoading: loading } = useAdminResearchesQuery(selectedId);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [expanded, setExpanded] = useState(null);
-
-  const load = () => {
-    if (!selectedId) return;
-    setLoading(true);
-    fetchResearches(selectedId)
-      .then((r) => setItems(r.data))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
-  };
-  useEffect(() => { load(); }, [selectedId]);
 
   const filtered = items
     .filter((s) => statusFilter === 'ALL' || s.status === statusFilter)
@@ -171,7 +158,6 @@ export default function Researches() {
           )}
         </div>
       </div>
-      {toast && <Toast key={Date.now()} message={toast.msg} type={toast.type} />}
     </>
   );
 }

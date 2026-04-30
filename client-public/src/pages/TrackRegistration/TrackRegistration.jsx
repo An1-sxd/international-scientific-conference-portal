@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { trackRegistration } from "../../api";
+import { useTrackRegistrationMutation } from "../../hooks/usePublicQueries";
 import useFormValidation from "../../hooks/useFormValidation";
 import "./TrackRegistration.css";
 
@@ -13,9 +13,9 @@ export default function TrackRegistration() {
   const [mode, setMode] = useState("id");
   const [registrationId, setRegistrationId] = useState("");
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const trackRegistrationMutation = useTrackRegistrationMutation();
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
 
   const switchMode = (m) => { setMode(m); setResults(null); setError(null); resetValidation(); };
@@ -28,17 +28,14 @@ export default function TrackRegistration() {
     const vals = mode === "id" ? { registrationId } : { email };
     if (!validate(vals, rules)) return;
 
-    setLoading(true);
     setError(null);
     setResults(null);
     try {
       const params = mode === "id" ? { registrationId } : { email };
-      const res = await trackRegistration(params);
+      const res = await trackRegistrationMutation.mutateAsync(params);
       setResults(res.data);
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -101,10 +98,10 @@ export default function TrackRegistration() {
             <button
               type="submit"
               className="btn btn--primary btn--lg"
-              disabled={loading}
+              disabled={trackRegistrationMutation.isPending}
               style={{ width: "100%" }}
             >
-              {loading ? "Searching…" : "Track Registration"}
+              {trackRegistrationMutation.isPending ? "Searching…" : "Track Registration"}
             </button>
           </form>
 

@@ -1,35 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchRegistrations, updateRegistrationStatus } from '../api';
+import { useConference } from '../components/conferenceContext';
+import {
+  useAdminRegistrationsQuery,
+  useUpdateRegistrationStatusMutation,
+} from '../hooks/useAdminQueries';
 import { ClipboardList } from 'lucide-react';
 
 const STATUSES = ['PENDING', 'ACCEPTED', 'REFUSED'];
 
 export default function Registrations() {
   const { selectedId } = useConference();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminRegistrationsQuery(selectedId);
+  const updateStatusMutation = useUpdateRegistrationStatusMutation(selectedId);
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('ALL');
 
-  const load = () => {
-    if (!selectedId) return;
-    setLoading(true);
-    fetchRegistrations(selectedId)
-      .then((r) => setItems(r.data))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
-  };
-  useEffect(() => { load(); }, [selectedId]);
-
   const changeStatus = async (id, registrationStatus) => {
     try {
-      await updateRegistrationStatus(id, { registrationStatus });
-      load();
+      await updateStatusMutation.mutateAsync({ id, body: { registrationStatus } });
       setToast({ msg: `Status → ${registrationStatus}`, type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };

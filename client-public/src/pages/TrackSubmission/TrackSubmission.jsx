@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { checkSubmissionStatus } from "../../api";
+import { useTrackSubmissionMutation } from "../../hooks/usePublicQueries";
 import useFormValidation from "../../hooks/useFormValidation";
 import "./TrackSubmission.css";
 
@@ -15,9 +15,9 @@ export default function TrackSubmission() {
   const [submissionId, setSubmissionId] = useState("");
   const [email, setEmail] = useState("");
   const [paperTitle, setPaperTitle] = useState("");
-  const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const trackSubmissionMutation = useTrackSubmissionMutation();
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
 
   const switchMode = (m) => { setMode(m); resetValidation(); };
@@ -30,7 +30,6 @@ export default function TrackSubmission() {
     const vals = mode === "id" ? { submissionId } : { email, paperTitle };
     if (!validate(vals, rules)) return;
 
-    setLoading(true);
     setError(null);
     setResult(null);
     try {
@@ -38,12 +37,10 @@ export default function TrackSubmission() {
         mode === "id"
           ? { submissionId }
           : { email, paperTitle };
-      const res = await checkSubmissionStatus(params);
+      const res = await trackSubmissionMutation.mutateAsync(params);
       setResult(res.data);
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -118,10 +115,10 @@ export default function TrackSubmission() {
             <button
               type="submit"
               className="btn btn--primary btn--lg"
-              disabled={loading}
+              disabled={trackSubmissionMutation.isPending}
               style={{ width: "100%" }}
             >
-              {loading ? "Searching…" : "Track Submission"}
+              {trackSubmissionMutation.isPending ? "Searching…" : "Track Submission"}
             </button>
           </form>
 

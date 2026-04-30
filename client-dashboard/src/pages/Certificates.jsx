@@ -1,39 +1,35 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchCertificates, generateCertificatesBatch, uploadCertificatePdf, generateCertificatePdf } from '../api';
+import { useConference } from '../components/conferenceContext';
+import {
+  useAdminCertificatesQuery,
+  useGenerateCertificatePdfMutation,
+  useGenerateCertificatesBatchMutation,
+  useUploadCertificatePdfMutation,
+} from '../hooks/useAdminQueries';
 import { Award, Zap, Paperclip } from 'lucide-react';
 
 export default function Certificates() {
   const { selectedId } = useConference();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminCertificatesQuery(selectedId);
+  const batchGenerateMutation = useGenerateCertificatesBatchMutation(selectedId);
+  const uploadPdfMutation = useUploadCertificatePdfMutation(selectedId);
+  const generatePdfMutation = useGenerateCertificatePdfMutation(selectedId);
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [generating, setGenerating] = useState(false);
   const [uploading, setUploading] = useState(null);
   const [generatingPdf, setGeneratingPdf] = useState(null);
 
-  const load = () => {
-    if (!selectedId) return;
-    setLoading(true);
-    fetchCertificates(selectedId)
-      .then((r) => setItems(r.data))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
-  };
-  useEffect(() => { load(); }, [selectedId]);
-
   const batchGenerate = async () => {
     if (!confirm('Generate certificates for all confirmed attendees?')) return;
     setGenerating(true);
     try {
-      const res = await generateCertificatesBatch(selectedId);
+      const res = await batchGenerateMutation.mutateAsync();
       const d = res.data;
       setToast({ msg: `Generated: ${d.generated}, Skipped: ${d.skipped}`, type: 'success' });
-      load();
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
     finally { setGenerating(false); }
   };
@@ -43,9 +39,8 @@ export default function Certificates() {
     try {
       const fd = new FormData();
       fd.append('pdf', file);
-      await uploadCertificatePdf(certId, fd);
+      await uploadPdfMutation.mutateAsync({ id: certId, formData: fd });
       setToast({ msg: 'Certificate PDF uploaded!', type: 'success' });
-      load();
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
     finally { setUploading(null); }
   };
@@ -53,9 +48,8 @@ export default function Certificates() {
   const handleGeneratePdf = async (certId) => {
     setGeneratingPdf(certId);
     try {
-      await generateCertificatePdf(certId);
+      await generatePdfMutation.mutateAsync(certId);
       setToast({ msg: 'Certificate PDF generated & uploaded to CDN!', type: 'success' });
-      load();
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
     finally { setGeneratingPdf(null); }
   };
