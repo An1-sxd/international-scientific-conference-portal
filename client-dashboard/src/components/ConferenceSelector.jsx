@@ -1,4 +1,4 @@
-import { useConference } from './ConferenceProvider';
+import { useConference } from './conferenceContext';
 
 export default function ConferenceSelector() {
   const { conferences, selectedId, setSelectedId, loading } = useConference();

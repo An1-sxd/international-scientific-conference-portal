@@ -1,37 +1,25 @@
-import { useState, useEffect, createContext, useContext } from 'react';
-import { fetchCurrentAdmin, loginAdmin as apiLogin, logoutAdmin as apiLogout } from '../api';
-
-const AuthContext = createContext();
-
-export function useAuth() {
-  return useContext(AuthContext);
-}
+import { AuthContext } from './authContext';
+import {
+  useCurrentAdminQuery,
+  useLoginAdminMutation,
+  useLogoutAdminMutation,
+} from '../hooks/useAdminQueries';
 
 export function AuthProvider({ children }) {
-  const [admin, setAdmin] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  // Check if already logged in on mount
-  useEffect(() => {
-    fetchCurrentAdmin()
-      .then((res) => setAdmin(res.data.admin))
-      .catch(() => setAdmin(null))
-      .finally(() => setLoading(false));
-  }, []);
+  const currentAdminQuery = useCurrentAdminQuery();
+  const loginMutation = useLoginAdminMutation();
+  const logoutMutation = useLogoutAdminMutation();
 
   const login = async (email, password) => {
-    const res = await apiLogin(email, password);
-    setAdmin(res.data.admin);
-    return res;
+    return loginMutation.mutateAsync({ email, password });
   };
 
   const logout = async () => {
-    await apiLogout();
-    setAdmin(null);
+    await logoutMutation.mutateAsync();
   };
 
   return (
-    <AuthContext.Provider value={{ admin, loading, login, logout }}>
+    <AuthContext.Provider value={{ admin: currentAdminQuery.data || null, loading: currentAdminQuery.isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

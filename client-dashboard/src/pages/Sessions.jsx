@@ -1,11 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchSessions, createSession, updateSession, deleteSession, fetchThemes, fetchSpeakers } from '../api';
+import { useConference } from '../components/conferenceContext';
+import {
+  useAdminSessionsQuery,
+  useAdminSpeakersQuery,
+  useAdminThemesQuery,
+  useCreateSessionMutation,
+  useDeleteSessionMutation,
+  useUpdateSessionMutation,
+} from '../hooks/useAdminQueries';
 import { CalendarDays } from 'lucide-react';
 import useFormValidation from '../hooks/useFormValidation';
 
@@ -13,28 +20,23 @@ const empty = { sessionTitle: '', themeId: '', speakerId: '', startsAt: '', ends
 
 export default function Sessions() {
   const { selectedId } = useConference();
-  const [items, setItems] = useState([]);
-  const [themes, setThemes] = useState([]);
-  const [speakers, setSpeakers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const sessionsQuery = useAdminSessionsQuery(selectedId);
+  const themesQuery = useAdminThemesQuery(selectedId);
+  const speakersQuery = useAdminSpeakersQuery(selectedId);
+  const createMutation = useCreateSessionMutation(selectedId);
+  const updateMutation = useUpdateSessionMutation(selectedId);
+  const deleteMutation = useDeleteSessionMutation(selectedId);
+  const items = sessionsQuery.data || [];
+  const themes = themesQuery.data || [];
+  const speakers = speakersQuery.data || [];
+  const loading = sessionsQuery.isLoading || themesQuery.isLoading || speakersQuery.isLoading;
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(empty);
   const [editId, setEditId] = useState(null);
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [confirmTarget, setConfirmTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
-
-  const load = () => {
-    if (!selectedId) return;
-    setLoading(true);
-    Promise.all([fetchSessions(selectedId), fetchThemes(selectedId), fetchSpeakers(selectedId)])
-      .then(([s, t, sp]) => { setItems(s.data); setThemes(t.data); setSpeakers(sp.data); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  };
-  useEffect(() => { load(); }, [selectedId]);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
   const fmt = (d) => d ? new Date(d).toISOString().slice(0, 16) : '';
@@ -50,23 +52,20 @@ export default function Sessions() {
     try {
       const body = { ...form };
       if (!body.speakerId) delete body.speakerId;
-      if (modal === 'add') await createSession(selectedId, body);
-      else await updateSession(editId, body);
-      setModal(null); load();
+      if (modal === 'add') await createMutation.mutateAsync(body);
+      else await updateMutation.mutateAsync({ id: editId, body });
+      setModal(null);
       setToast({ msg: modal === 'add' ? 'Session created!' : 'Session updated!', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
   const remove = async () => {
     if (!confirmTarget) return;
-    setDeleting(true);
     try {
-      await deleteSession(confirmTarget);
+      await deleteMutation.mutateAsync(confirmTarget);
       setConfirmTarget(null);
-      load();
       setToast({ msg: 'Session deleted.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
-    finally { setDeleting(false); }
   };
 
   const filtered = items.filter((s) => s.sessionTitle.toLowerCase().includes(search.toLowerCase()));
@@ -137,7 +136,7 @@ export default function Sessions() {
           title="Delete Session"
           message="Are you sure you want to delete this session? This action cannot be undone."
           confirmText="Delete"
-          loading={deleting}
+          loading={deleteMutation.isPending}
           onConfirm={remove}
           onCancel={() => setConfirmTarget(null)}
         />

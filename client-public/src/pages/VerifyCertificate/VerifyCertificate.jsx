@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { checkCertificateStatus } from "../../api";
+import { useCertificateStatusMutation } from "../../hooks/usePublicQueries";
 import { XCircle, Clock, CheckCircle2, Eye, Download } from "lucide-react";
 import useFormValidation from "../../hooks/useFormValidation";
 import "./VerifyCertificate.css";
@@ -8,9 +8,9 @@ export default function VerifyCertificate() {
   const [mode, setMode] = useState("id");
   const [registrationId, setRegistrationId] = useState("");
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const certificateStatusMutation = useCertificateStatusMutation();
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
 
   const resetForm = (newMode) => {
@@ -28,17 +28,14 @@ export default function VerifyCertificate() {
     const vals = mode === "id" ? { registrationId } : { email };
     if (!validate(vals, rules)) return;
 
-    setLoading(true);
     setError(null);
     setResults(null);
     try {
       const params = mode === "id" ? { registrationId } : { email };
-      const res = await checkCertificateStatus(params);
+      const res = await certificateStatusMutation.mutateAsync(params);
       setResults(res.data);
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -101,10 +98,10 @@ export default function VerifyCertificate() {
             <button
               type="submit"
               className="btn btn--primary btn--lg"
-              disabled={loading}
+              disabled={certificateStatusMutation.isPending}
               style={{ width: "100%" }}
             >
-              {loading ? "Checking…" : "Check Certificate Status"}
+              {certificateStatusMutation.isPending ? "Checking…" : "Check Certificate Status"}
             </button>
           </form>
 

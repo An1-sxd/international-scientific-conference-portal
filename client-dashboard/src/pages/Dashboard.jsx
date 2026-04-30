@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchDashboardStats } from '../api';
+import { useConference } from '../components/conferenceContext';
+import { useDashboardStatsQuery } from '../hooks/useAdminQueries';
 import {
   Mic2, CalendarDays, FileText, ClipboardList,
   CheckCircle2, Award, Building2,
@@ -19,17 +18,7 @@ const iconMap = {
 
 export default function Dashboard() {
   const { selectedId, selected, loading: confLoading } = useConference();
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!selectedId) return;
-    setLoading(true);
-    fetchDashboardStats(selectedId)
-      .then((res) => setStats(res.stats))
-      .catch(() => setStats(null))
-      .finally(() => setLoading(false));
-  }, [selectedId]);
+  const { data: stats = null, isLoading } = useDashboardStatsQuery(selectedId);
 
   const cards = stats
     ? [
@@ -50,7 +39,7 @@ export default function Dashboard() {
         <ConferenceSelector />
       </Topbar>
       <div className="page-content fade-in">
-        {confLoading || loading ? (
+        {confLoading || isLoading ? (
           <div className="loader-wrap"><div className="loader" /></div>
         ) : !selected ? (
           <div className="empty-state">

@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './components/AuthProvider';
+import { AuthProvider } from './components/AuthProvider';
+import { useAuth } from './components/authContext';
 import Sidebar from './components/Sidebar';
 import { ConferenceProvider } from './components/ConferenceProvider';
 import Dashboard from './pages/Dashboard';

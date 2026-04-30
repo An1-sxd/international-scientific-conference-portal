@@ -1,11 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchParticipants, updateParticipant, deleteParticipant, updateRegistrationStatus } from '../api';
+import { useConference } from '../components/conferenceContext';
+import {
+  useAdminParticipantsQuery,
+  useDeleteParticipantMutation,
+  useUpdateParticipantMutation,
+  useUpdateRegistrationStatusMutation,
+} from '../hooks/useAdminQueries';
 import { Users } from 'lucide-react';
 import useFormValidation from '../hooks/useFormValidation';
 
@@ -13,8 +18,10 @@ const TYPES = ['STUDENT', 'RESEARCHER', 'PROFESSOR', 'GUEST', 'INDUSTRY'];
 
 export default function Participants() {
   const { selectedId } = useConference();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminParticipantsQuery(selectedId);
+  const updateParticipantMutation = useUpdateParticipantMutation(selectedId);
+  const deleteParticipantMutation = useDeleteParticipantMutation(selectedId);
+  const updateRegistrationMutation = useUpdateRegistrationStatusMutation(selectedId);
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState({});
   const [editId, setEditId] = useState(null);
@@ -22,18 +29,7 @@ export default function Participants() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [confirmTarget, setConfirmTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
-
-  const load = () => {
-    if (!selectedId) return;
-    setLoading(true);
-    fetchParticipants(selectedId)
-      .then((r) => setItems(r.data))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
-  };
-  useEffect(() => { load(); }, [selectedId]);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -45,28 +41,24 @@ export default function Participants() {
   const save = async () => {
     if (!validate(form, { fullName: { required: true }, email: { required: true, email: true }, phone: { phone: true } })) return;
     try {
-      await updateParticipant(editId, form);
-      setModal(false); load();
+      await updateParticipantMutation.mutateAsync({ id: editId, body: form });
+      setModal(false);
       setToast({ msg: 'Participant updated!', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
   const remove = async () => {
     if (!confirmTarget) return;
-    setDeleting(true);
     try {
-      await deleteParticipant(confirmTarget);
+      await deleteParticipantMutation.mutateAsync(confirmTarget);
       setConfirmTarget(null);
-      load();
       setToast({ msg: 'Participant deleted.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
-    finally { setDeleting(false); }
   };
 
   const togglePresence = async (p) => {
     try {
-      await updateRegistrationStatus(p.registrationRef, { attendanceConfirmed: !p.attendanceConfirmed });
-      load();
+      await updateRegistrationMutation.mutateAsync({ id: p.registrationRef, body: { attendanceConfirmed: !p.attendanceConfirmed } });
       setToast({
         msg: p.attendanceConfirmed ? `${p.fullName} marked as absent` : `${p.fullName} marked as present`,
         type: 'success',
@@ -179,7 +171,7 @@ export default function Participants() {
           title="Delete Participant"
           message="Are you sure you want to delete this participant and all related data? This action cannot be undone."
           confirmText="Delete"
-          loading={deleting}
+          loading={deleteParticipantMutation.isPending}
           onConfirm={remove}
           onCancel={() => setConfirmTarget(null)}
         />

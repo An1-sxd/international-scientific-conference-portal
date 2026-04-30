@@ -1,55 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FileText } from 'lucide-react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchSubmissions, updateSubmissionStatus, deleteSubmission } from '../api';
+import { useConference } from '../components/conferenceContext';
+import {
+  useAdminSubmissionsQuery,
+  useDeleteSubmissionMutation,
+  useUpdateSubmissionStatusMutation,
+} from '../hooks/useAdminQueries';
 
 const STATUSES = ['PENDING', 'UNDER_REVIEW', 'ACCEPTED', 'REJECTED', 'PUBLISHED'];
 
 export default function Submissions() {
   const { selectedId } = useConference();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminSubmissionsQuery(selectedId);
+  const updateStatusMutation = useUpdateSubmissionStatusMutation(selectedId);
+  const deleteSubmissionMutation = useDeleteSubmissionMutation(selectedId);
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('ALL');
   const [expandedId, setExpandedId] = useState(null);
   const [comment, setComment] = useState('');
   const [confirmTarget, setConfirmTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
-
-  const load = () => { if (!selectedId) return; setLoading(true); fetchSubmissions(selectedId).then((r) => setItems(r.data)).catch(() => setItems([])).finally(() => setLoading(false)); };
-  useEffect(() => { load(); }, [selectedId]);
 
   const changeStatus = async (id, status) => {
     try {
-      await updateSubmissionStatus(id, { status });
-      load();
+      await updateStatusMutation.mutateAsync({ id, body: { status } });
       setToast({ msg: `Status updated to ${status}`, type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
   const saveComment = async (id) => {
     try {
-      await updateSubmissionStatus(id, { reviewComment: comment });
-      load();
+      await updateStatusMutation.mutateAsync({ id, body: { reviewComment: comment } });
       setToast({ msg: 'Review comment saved.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
   const handleDelete = async () => {
     if (!confirmTarget) return;
-    setDeleting(true);
     try {
-      await deleteSubmission(confirmTarget);
+      await deleteSubmissionMutation.mutateAsync(confirmTarget);
       setConfirmTarget(null);
-      load();
       setToast({ msg: 'Submission deleted successfully.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
-    finally { setDeleting(false); }
   };
 
   const filtered = items
@@ -139,7 +135,7 @@ export default function Submissions() {
           title="Delete Submission"
           message="Are you sure you want to delete this submission? This will permanently remove the submission and its related data. This action cannot be undone."
           confirmText="Delete"
-          loading={deleting}
+          loading={deleteSubmissionMutation.isPending}
           onConfirm={handleDelete}
           onCancel={() => setConfirmTarget(null)}
         />

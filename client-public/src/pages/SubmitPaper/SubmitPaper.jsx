@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
-import { fetchConferences, fetchThemes, submitPaper } from "../../api";
+import {
+  usePublicConferencesQuery,
+  usePublicThemesQuery,
+  useSubmitPaperMutation,
+} from "../../hooks/usePublicQueries";
 import { CheckCircle2, X } from "lucide-react";
 import FileInput from "../../components/FileInput";
 import useFormValidation from "../../hooks/useFormValidation";
 import "./SubmitPaper.css";
 
 export default function SubmitPaper() {
-  const [conferences, setConferences] = useState([]);
+  const { data: conferences = [] } = usePublicConferencesQuery();
   const [selectedConf, setSelectedConf] = useState("");
-  const [themes, setThemes] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { data: themes = [] } = usePublicThemesQuery(selectedConf, { enabled: Boolean(selectedConf) });
+  const submitPaperMutation = useSubmitPaperMutation();
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
@@ -27,26 +31,13 @@ export default function SubmitPaper() {
 
   const { touched, errors, touchField, validate, groupClass } = useFormValidation();
 
-  // Load conferences on mount
   useEffect(() => {
-    fetchConferences()
-      .then((res) => {
-        setConferences(res.data || []);
-        // Auto-select first conference if available
-        if (res.data?.length > 0) {
-          setSelectedConf(res.data[0]._id || res.data[0].id);
-        }
-      })
-      .catch(() => {});
-  }, []);
+    if (!selectedConf && conferences.length > 0) {
+      setSelectedConf(conferences[0]._id || conferences[0].id);
+    }
+  }, [conferences, selectedConf]);
 
-  // Load themes when conference changes
   useEffect(() => {
-    if (!selectedConf) { setThemes([]); return; }
-    fetchThemes(selectedConf)
-      .then((res) => setThemes(res.data || []))
-      .catch(() => setThemes([]));
-    // Reset theme selection when conference changes
     setForm((prev) => ({ ...prev, themeId: "" }));
   }, [selectedConf]);
 
@@ -101,7 +92,6 @@ export default function SubmitPaper() {
 
     if (!validate(flatForm, rules)) return;
 
-    setLoading(true);
     setError(null);
     try {
       const fd = new FormData();
@@ -117,12 +107,10 @@ export default function SubmitPaper() {
       );
       if (pdfFile) fd.append("pdf", pdfFile);
 
-      const res = await submitPaper(fd);
+      const res = await submitPaperMutation.mutateAsync(fd);
       setResult(res.data);
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -342,11 +330,11 @@ export default function SubmitPaper() {
           <button
             type="submit"
             className="btn btn--primary btn--lg"
-            disabled={loading || !selectedConf}
+            disabled={submitPaperMutation.isPending || !selectedConf}
             id="submit-paper-btn"
             style={{ width: "100%" }}
           >
-            {loading ? "Submitting…" : "Submit Paper"}
+            {submitPaperMutation.isPending ? "Submitting…" : "Submit Paper"}
           </button>
         </form>
       </div>

@@ -1,24 +1,14 @@
-import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { fetchSpeakerById } from "../../api";
+import { usePublicSpeakerQuery } from "../../hooks/usePublicQueries";
 import { Building2, MapPin, Mail } from "lucide-react";
 import "./SpeakerDetail.css";
 
 export default function SpeakerDetail() {
   const { id } = useParams();
-  const [speaker, setSpeaker] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: speaker, isLoading, error } = usePublicSpeakerQuery(id);
 
-  useEffect(() => {
-    fetchSpeakerById(id)
-      .then((res) => setSpeaker(res.data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  if (loading) return <div className="loader-wrap"><div className="loader"></div></div>;
-  if (error) return <div className="error-box">{error}</div>;
+  if (isLoading) return <div className="loader-wrap"><div className="loader"></div></div>;
+  if (error) return <div className="error-box">{error.message}</div>;
   if (!speaker) return <div className="error-box">Speaker not found.</div>;
 
   const initials = speaker.fullName

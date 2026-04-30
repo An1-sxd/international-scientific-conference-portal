@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import FileInput from '../components/FileInput';
-import { useConference } from '../components/ConferenceProvider';
-import { fetchSpeakers, createSpeaker, updateSpeaker, deleteSpeaker } from '../api';
+import { useConference } from '../components/conferenceContext';
+import {
+  useAdminSpeakersQuery,
+  useCreateSpeakerMutation,
+  useDeleteSpeakerMutation,
+  useUpdateSpeakerMutation,
+} from '../hooks/useAdminQueries';
 import { Mic2 } from 'lucide-react';
 import useFormValidation from '../hooks/useFormValidation';
 
@@ -14,8 +19,10 @@ const empty = { fullName: '', academicTitle: '', affiliation: '', country: '', t
 
 export default function Speakers() {
   const { selectedId } = useConference();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items = [], isLoading: loading } = useAdminSpeakersQuery(selectedId);
+  const createMutation = useCreateSpeakerMutation(selectedId);
+  const updateMutation = useUpdateSpeakerMutation(selectedId);
+  const deleteMutation = useDeleteSpeakerMutation(selectedId);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(empty);
   const [photo, setPhoto] = useState(null);
@@ -23,11 +30,7 @@ export default function Speakers() {
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [confirmTarget, setConfirmTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
-
-  const load = () => { if (!selectedId) return; setLoading(true); fetchSpeakers(selectedId).then((r) => setItems(r.data)).catch(() => setItems([])).finally(() => setLoading(false)); };
-  useEffect(() => { load(); }, [selectedId]);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -40,23 +43,20 @@ export default function Speakers() {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => { if (v) fd.append(k, v); });
       if (photo) fd.append('photo', photo);
-      if (modal === 'add') await createSpeaker(selectedId, fd);
-      else await updateSpeaker(editId, fd);
-      setModal(null); load();
+      if (modal === 'add') await createMutation.mutateAsync(fd);
+      else await updateMutation.mutateAsync({ id: editId, formData: fd });
+      setModal(null);
       setToast({ msg: modal === 'add' ? 'Speaker added!' : 'Speaker updated!', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
   const remove = async () => {
     if (!confirmTarget) return;
-    setDeleting(true);
     try {
-      await deleteSpeaker(confirmTarget);
+      await deleteMutation.mutateAsync(confirmTarget);
       setConfirmTarget(null);
-      load();
       setToast({ msg: 'Speaker deleted.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
-    finally { setDeleting(false); }
   };
 
   const filtered = items.filter((s) => s.fullName.toLowerCase().includes(search.toLowerCase()));
@@ -117,7 +117,7 @@ export default function Speakers() {
           title="Delete Speaker"
           message="Are you sure you want to delete this speaker? This action cannot be undone."
           confirmText="Delete"
-          loading={deleting}
+          loading={deleteMutation.isPending}
           onConfirm={remove}
           onCancel={() => setConfirmTarget(null)}
         />

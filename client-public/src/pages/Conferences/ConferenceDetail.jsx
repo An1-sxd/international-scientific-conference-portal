@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { fetchConferenceById, registerForConference } from "../../api";
+import { usePublicConferenceQuery, useRegisterForConferenceMutation } from "../../hooks/usePublicQueries";
 import SpeakerCard from "../../components/SpeakerCard";
 import { CalendarDays, MapPin, Mail, DoorOpen, X, CheckCircle2 } from "lucide-react";
 import useFormValidation from "../../hooks/useFormValidation";
@@ -21,27 +21,18 @@ function fmtTime(dateStr) {
 
 export default function ConferenceDetail() {
   const { id } = useParams();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, isLoading, error } = usePublicConferenceQuery(id);
+  const registerMutation = useRegisterForConferenceMutation();
 
   // Registration modal state
   const [showRegModal, setShowRegModal] = useState(false);
   const [regForm, setRegForm] = useState({
     fullName: "", email: "", phone: "", affiliation: "", country: "", participantType: "RESEARCHER",
   });
-  const [regLoading, setRegLoading] = useState(false);
   const [regResult, setRegResult] = useState(null);
   const [regError, setRegError] = useState(null);
 
   const { touched, errors, touchField, validate, groupClass, resetValidation } = useFormValidation();
-
-  useEffect(() => {
-    fetchConferenceById(id)
-      .then((res) => setData(res.data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id]);
 
   const openRegModal = () => {
     setRegForm({ fullName: "", email: "", phone: "", affiliation: "", country: "", participantType: "RESEARCHER" });
@@ -60,23 +51,20 @@ export default function ConferenceDetail() {
     };
     if (!validate(regForm, rules)) return;
 
-    setRegLoading(true);
     setRegError(null);
     try {
-      const res = await registerForConference({
+      const res = await registerMutation.mutateAsync({
         ...regForm,
         conferenceId: id,
       });
       setRegResult(res.data);
     } catch (err) {
       setRegError(err.message);
-    } finally {
-      setRegLoading(false);
     }
   };
 
-  if (loading) return <div className="loader-wrap"><div className="loader"></div></div>;
-  if (error) return <div className="error-box">{error}</div>;
+  if (isLoading) return <div className="loader-wrap"><div className="loader"></div></div>;
+  if (error) return <div className="error-box">{error.message}</div>;
   if (!data) return <div className="error-box">Conference not found.</div>;
 
   const { conference: conf, speakers, themes, sessions } = data;
@@ -294,8 +282,8 @@ export default function ConferenceDetail() {
                       <option value="INDUSTRY">Industry</option>
                     </select>
                   </div>
-                  <button className="btn btn--primary btn--lg" style={{ width: "100%" }} disabled={regLoading} type="submit">
-                    {regLoading ? "Registering…" : "Register"}
+                  <button className="btn btn--primary btn--lg" style={{ width: "100%" }} disabled={registerMutation.isPending} type="submit">
+                    {registerMutation.isPending ? "Registering…" : "Register"}
                   </button>
                 </form>
               </>

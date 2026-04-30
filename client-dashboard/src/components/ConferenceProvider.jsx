@@ -1,42 +1,31 @@
-import { useState, useEffect, createContext, useContext } from 'react';
-import { fetchConferences } from '../api';
-
-const ConferenceContext = createContext();
-
-export function useConference() {
-  return useContext(ConferenceContext);
-}
+import { useEffect, useMemo, useState } from 'react';
+import { ConferenceContext } from './conferenceContext';
+import { useAdminConferencesQuery } from '../hooks/useAdminQueries';
 
 export function ConferenceProvider({ children }) {
-  const [conferences, setConferences] = useState([]);
   const [selectedId, setSelectedId] = useState('');
-  const [loading, setLoading] = useState(true);
+  const conferencesQuery = useAdminConferencesQuery();
+  const conferences = useMemo(() => conferencesQuery.data || [], [conferencesQuery.data]);
 
   useEffect(() => {
-    fetchConferences()
-      .then((res) => {
-        setConferences(res.data);
-        if (res.data.length > 0) {
-          setSelectedId(res.data[0]._id);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    if (!selectedId && conferences.length > 0) {
+      setSelectedId(conferences[0]._id);
+    }
+  }, [conferences, selectedId]);
 
-  const refresh = () =>
-    fetchConferences().then((res) => {
-      setConferences(res.data);
-      if (!res.data.find((c) => c._id === selectedId) && res.data.length > 0) {
-        setSelectedId(res.data[0]._id);
-      }
-    });
+  useEffect(() => {
+    if (selectedId && conferences.length > 0 && !conferences.find((c) => c._id === selectedId)) {
+      setSelectedId(conferences[0]._id);
+    }
+  }, [conferences, selectedId]);
+
+  const refresh = () => conferencesQuery.refetch();
 
   const selected = conferences.find((c) => c._id === selectedId) || null;
 
   return (
     <ConferenceContext.Provider
-      value={{ conferences, selected, selectedId, setSelectedId, loading, refresh }}
+      value={{ conferences, selected, selectedId, setSelectedId, loading: conferencesQuery.isLoading, refresh }}
     >
       {children}
     </ConferenceContext.Provider>
