@@ -3,7 +3,7 @@ import Topbar from '../components/Topbar';
 import ConferenceSelector from '../components/ConferenceSelector';
 import Toast from '../components/Toast';
 import { useConference } from '../components/ConferenceProvider';
-import { fetchSubmissions, updateSubmissionStatus } from '../api';
+import { fetchSubmissions, updateSubmissionStatus, deleteSubmission } from '../api';
 
 const STATUSES = ['PENDING', 'UNDER_REVIEW', 'ACCEPTED', 'REJECTED', 'PUBLISHED'];
 
@@ -33,6 +33,15 @@ export default function Submissions() {
       await updateSubmissionStatus(id, { reviewComment: comment });
       load();
       setToast({ msg: 'Review comment saved.', type: 'success' });
+    } catch (e) { setToast({ msg: e.message, type: 'error' }); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this submission? This action cannot be undone.')) return;
+    try {
+      await deleteSubmission(id);
+      load();
+      setToast({ msg: 'Submission deleted successfully.', type: 'success' });
     } catch (e) { setToast({ msg: e.message, type: 'error' }); }
   };
 
@@ -80,6 +89,7 @@ export default function Submissions() {
                             {expandedId === s._id ? 'Close' : 'Details'}
                           </button>
                           {s.pdfUrl && <a href={s.pdfUrl} target="_blank" rel="noreferrer" className="btn btn--outline btn--sm">PDF</a>}
+                          <button className="btn btn--danger btn--sm" onClick={() => handleDelete(s._id)}>Delete</button>
                         </div>
                       </td>
                     </tr>

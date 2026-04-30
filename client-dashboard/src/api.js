@@ -66,6 +66,8 @@ export const fetchSubmissions = (conferenceId) =>
   request(`/submissions?conferenceId=${conferenceId}`);
 export const updateSubmissionStatus = (id, body) =>
   request(`/submissions/${id}/status`, { method: "PATCH", body: JSON.stringify(body) });
+export const deleteSubmission = (id) =>
+  request(`/submissions/${id}`, { method: "DELETE" });
 
 // ─── Registrations ───
 export const fetchRegistrations = (conferenceId) =>

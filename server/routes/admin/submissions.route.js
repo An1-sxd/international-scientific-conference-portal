@@ -4,6 +4,7 @@ import Submission from "../../models/submission.model.js";
 import { SUBMISSION_STATUSES } from "../../constants/enums.js";
 import { handleModelError, resolveConference, sendError, isValidObjectId } from "../public/helpers.js";
 import { sendSubmissionStatusEmail } from "../../services/email.service.js";
+import { deleteAsset } from "../../services/cloudinary.service.js";
 
 const router = express.Router();
 
@@ -54,6 +55,28 @@ router.patch("/submissions/:id/status", async (req, res) => {
     }
 
     return res.json({ success: true, data: submission });
+  } catch (error) {
+    return handleModelError(res, error);
+  }
+});
+
+router.delete("/submissions/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!isValidObjectId(id)) return sendError(res, 400, "Invalid submission ID.");
+
+    const submission = await Submission.findById(id);
+    if (!submission) return sendError(res, 404, "Submission not found.");
+
+    // Clean up the PDF from Cloudinary
+    if (submission.pdfPublicId) {
+      await deleteAsset(submission.pdfPublicId);
+    }
+
+    // Delete the submission
+    await submission.deleteOne();
+
+    return res.json({ success: true, message: "Submission deleted successfully." });
   } catch (error) {
     return handleModelError(res, error);
   }
