@@ -8,7 +8,9 @@ const app = express();
 
 // ✅ CORS with credentials for cookie-based auth
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174","*"],
+  origin: ["http://localhost:5173", "http://localhost:5174","https://international-scientific-conference-portal-kt31budmv.vercel.app", // The exact URL from your error
+    // IMPORTANT: If you have a main, permanent Vercel URL, add it here too!
+    "https://international-scientific-conference-portal-YOUR-MAIN-LINK.vercel.app"],
   credentials: true,
 }));
 
