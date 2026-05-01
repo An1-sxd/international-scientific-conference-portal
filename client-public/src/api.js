@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = process.env.API_BASE || "http://localhost:3000/api";
 
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
