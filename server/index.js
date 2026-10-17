@@ -1,8 +1,12 @@
 import app from "./app.js";
 import dotenv from "dotenv";
-dotenv.config();
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import connectDB from "./config/db.js";
 import "./models/index.js";
+
+const serverDirectory = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(serverDirectory, "../.env") });
 
 connectDB();
 
